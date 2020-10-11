@@ -11,13 +11,13 @@ namespace RealStereo
     class Camera
     {
         private VideoCapture capture;
-        private HOGDescriptor hogDescriptor;
+        private PeopleDetector peopleDetector;
         private Image<Bgr, byte> frame;
 
-        public Camera(int cameraIndex, HOGDescriptor hogDescriptor)
+        public Camera(int cameraIndex, PeopleDetector peopleDetector)
         {
             this.capture = new VideoCapture(cameraIndex);
-            this.hogDescriptor = hogDescriptor;
+            this.peopleDetector = peopleDetector;
         }
 
         public void Process()
@@ -30,14 +30,19 @@ namespace RealStereo
             frame = frame.Resize((int) (frame.Width * ratio), (int) (frame.Height * ratio), Inter.Cubic);
 
             // detect people
-            MCvObjectDetection[] regions = hogDescriptor.DetectMultiScale(frame, 0, new Size(4, 4), new Size(8, 8));
+            MCvObjectDetection[] regions = peopleDetector.Detect(frame);
+            MCvObjectDetection[] normalized = peopleDetector.Normalize(regions);
             
+            // draw both region arrays on the image
             foreach (MCvObjectDetection region in regions)
             {
                 frame.Draw(region.Rect, new Bgr(Color.Blue), 1);
             }
             
-            System.Diagnostics.Debug.WriteLine("Num regions: " + regions.Length);
+            foreach (MCvObjectDetection region in normalized)
+            {
+                frame.Draw(region.Rect, new Bgr(Color.Green), 2);
+            }
         }
 
         public BitmapImage GetFrame()

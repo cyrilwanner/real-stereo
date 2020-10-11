@@ -20,12 +20,11 @@ namespace RealStereo
             InitializeComponent();
 
             // create HOG descriptor
-            HOGDescriptor hogDescriptor = new HOGDescriptor();
-            hogDescriptor.SetSVMDetector(HOGDescriptor.GetDefaultPeopleDetector());
+            PeopleDetector peopleDetector = new PeopleDetector();
 
             // register cameras
-            cameras.Add(camera1, new Camera(0, hogDescriptor));
-            cameras.Add(camera2, new Camera(1, hogDescriptor));
+            cameras.Add(camera1, new Camera(0, peopleDetector));
+            cameras.Add(camera2, new Camera(1, peopleDetector));
 
             Loaded += new RoutedEventHandler(StartCameras);
         }
