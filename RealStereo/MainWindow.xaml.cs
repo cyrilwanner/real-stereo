@@ -1,17 +1,9 @@
-﻿using System;
+﻿using Emgu.CV;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+using System.Windows.Threading;
 
 namespace RealStereo
 {
@@ -20,9 +12,39 @@ namespace RealStereo
     /// </summary>
     public partial class MainWindow : Window
     {
+        private Dictionary<Image, Camera> cameras = new Dictionary<Image, Camera>();
+        private DispatcherTimer timer;
+
         public MainWindow()
         {
             InitializeComponent();
+
+            // create HOG descriptor
+            HOGDescriptor hogDescriptor = new HOGDescriptor();
+            hogDescriptor.SetSVMDetector(HOGDescriptor.GetDefaultPeopleDetector());
+
+            // register cameras
+            cameras.Add(camera1, new Camera(0, hogDescriptor));
+            cameras.Add(camera2, new Camera(1, hogDescriptor));
+
+            Loaded += new RoutedEventHandler(StartCameras);
+        }
+
+        private void StartCameras(object sender, RoutedEventArgs e)
+        {
+            timer = new DispatcherTimer();
+            timer.Tick += new EventHandler(TimerTick);
+            timer.Interval = new TimeSpan(0, 0, 0, 0, 100);
+            timer.Start();
+        }
+
+        private void TimerTick(object sender, EventArgs e)
+        {
+            foreach (KeyValuePair<Image, Camera> entry in cameras)
+            {
+                entry.Value.Process();
+                entry.Key.Source = entry.Value.GetFrame();
+            }
         }
     }
 }

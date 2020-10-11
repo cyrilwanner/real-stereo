@@ -7,6 +7,20 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1*" />
+            <ColumnDefinition Width="1*" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="100" />
+        </Grid.RowDefinitions>
 
+        <Border BorderThickness="0" Background="Black" Grid.Column="0" Grid.Row="0">
+            <Image Name="camera1" />
+        </Border>
+        <Border BorderThickness="0" Background="Black" Grid.Column="1" Grid.Row="0">
+            <Image Name="camera2" />
+        </Border>
     </Grid>
 </Window>
