@@ -18,6 +18,7 @@ namespace RealStereo
         private DispatcherTimer timer;
         private PeopleDetector peopleDetector;
         private FilterInfoCollection videoDevices;
+        private Dictionary<string, int> videoDeviceNameIndexDictionary = new Dictionary<string, int>();
 
         public MainWindow()
         {
@@ -33,10 +34,11 @@ namespace RealStereo
         private void LoadCameras(object sender, RoutedEventArgs e)
         {
             videoDevices = new FilterInfoCollection(FilterCategory.VideoInputDevice);
-            foreach (FilterInfo camera in videoDevices)
+            for (int i = 0; i < videoDevices.Count; i++)
             {
-                camera1ComboBox.Items.Add(camera.Name);
-                camera2ComboBox.Items.Add(camera.Name);
+                videoDeviceNameIndexDictionary.Add(videoDevices[i].Name, i);
+                camera1ComboBox.Items.Add(new string(videoDevices[i].Name));
+                camera2ComboBox.Items.Add(new string(videoDevices[i].Name));
             }
         }
 
@@ -57,30 +59,28 @@ namespace RealStereo
             }
         }
 
-        private void camera1ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void cameraComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            var device = videoDevices
-                .OfType<FilterInfo>()
-                .Select((Value, Index) => new { Value, Index })
-                .Single(i => i.Value.Name == e.AddedItems[0] as string);
+            ComboBox comboBox = sender as ComboBox;
+            ComboBox otherComboBox = comboBox == camera1ComboBox ? camera2ComboBox : camera1ComboBox;
+            Image camera = comboBox == camera1ComboBox ? camera1 : camera2;
+            Image otherCamera = comboBox == camera1ComboBox ? camera2 : camera1;
 
-            camera2ComboBox.Items.Clear();
-            LoadCameras(null, null);
-            camera2ComboBox.Items.RemoveAt(device.Index);
-            cameras[camera1] = new Camera(device.Index, peopleDetector);
-        }
+            if (comboBox.SelectedItem as string != "None")
+            {
+                if (otherComboBox.SelectedItem as string == comboBox.SelectedItem as string)
+                {
+                    cameras.Remove(otherCamera);
+                    otherCamera.Source = null;
+                    otherComboBox.SelectedItem = "None";
+                }
 
-        private void camera2ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            var device = videoDevices
-                .OfType<FilterInfo>()
-                .Select((Value, Index) => new { Value, Index })
-                .Single(i => i.Value.Name == e.AddedItems[0] as string);
-
-            camera1ComboBox.Items.Clear();
-            LoadCameras(null, null);
-            camera1ComboBox.Items.RemoveAt(device.Index);
-            cameras[camera2] = new Camera(device.Index, peopleDetector);
+                cameras[camera] = new Camera(videoDeviceNameIndexDictionary[comboBox.SelectedItem as string], peopleDetector);
+            } else
+            {
+                cameras.Remove(camera);
+                camera.Source = null;
+            }
         }
     }
 }

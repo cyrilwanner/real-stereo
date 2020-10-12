@@ -1,9 +1,10 @@
-﻿<Window x:Class="RealStereo.MainWindow"
+﻿<Window
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:RealStereo"
+        xmlns:System="clr-namespace:System;assembly=System.Runtime" x:Class="RealStereo.MainWindow"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
@@ -17,12 +18,16 @@
         </Grid.RowDefinitions>
 
         <Border BorderThickness="0" Background="Black" Grid.Column="0" Grid.Row="0">
-            <Image Name="camera1" />
+            <Image x:Name="camera1" />
         </Border>
         <Border BorderThickness="0" Background="Black" Grid.Column="1" Grid.Row="0">
-            <Image Name="camera2" />
+            <Image x:Name="camera2" />
         </Border>
-        <ComboBox Name="camera1ComboBox" Grid.Column="1" HorizontalAlignment="Left" Margin="107,0,0,0" Grid.Row="1" VerticalAlignment="Center" Width="120" SelectionChanged="camera1ComboBox_SelectionChanged"/>
-        <ComboBox Name="camera2ComboBox" Grid.Column="1" HorizontalAlignment="Left" Margin="270,0,0,0" Grid.Row="1" VerticalAlignment="Center" Width="120" SelectionChanged="camera2ComboBox_SelectionChanged"/>
+        <ComboBox x:Name="camera1ComboBox" Grid.Column="1" HorizontalAlignment="Left" Margin="107,0,0,0" Grid.Row="1" VerticalAlignment="Center" Width="120" SelectionChanged="cameraComboBox_SelectionChanged" SelectedIndex="0">
+            <System:String>None</System:String>
+        </ComboBox>
+        <ComboBox x:Name="camera2ComboBox" Grid.Column="1" HorizontalAlignment="Left" Margin="270,0,0,0" Grid.Row="1" VerticalAlignment="Center" Width="120" SelectionChanged="cameraComboBox_SelectionChanged" SelectedIndex="0">
+            <System:String>None</System:String>
+        </ComboBox>
     </Grid>
 </Window>
