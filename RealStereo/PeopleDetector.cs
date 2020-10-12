@@ -1,12 +1,9 @@
 ﻿using Emgu.CV;
 using Emgu.CV.Structure;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using System.Runtime.Intrinsics.X86;
-using System.Text;
 
 namespace RealStereo
 {
@@ -46,7 +43,8 @@ namespace RealStereo
                         intersects = true;
                         int maxRight = Math.Max(result.Rect.Right, region.Rect.Right);
                         int maxBottom = Math.Max(result.Rect.Bottom, region.Rect.Bottom);
-                        
+
+                        // update existing region with merged bounds
                         result.Rect.X = Math.Min(result.Rect.X, region.Rect.X);
                         result.Rect.Y = Math.Min(result.Rect.Y, region.Rect.Y);
                         result.Rect.Width = maxRight - result.Rect.X;

@@ -1,10 +1,11 @@
 ﻿using Emgu.CV;
-using Emgu.CV.CvEnum;
 using Emgu.CV.Structure;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Windows.Controls;
 using System.Windows.Media.Imaging;
+using Inter = Emgu.CV.CvEnum.Inter;
 
 namespace RealStereo
 {
@@ -13,6 +14,7 @@ namespace RealStereo
         private VideoCapture capture;
         private PeopleDetector peopleDetector;
         private Image<Bgr, byte> frame;
+        private MCvObjectDetection[] people;
 
         public Camera(int cameraIndex, PeopleDetector peopleDetector)
         {
@@ -31,18 +33,19 @@ namespace RealStereo
 
             // detect people
             MCvObjectDetection[] regions = peopleDetector.Detect(frame);
-            MCvObjectDetection[] normalized = peopleDetector.Normalize(regions);
-            
+
+            // if no people got detected, assume they haven't moved and use the previous regions
+            if (regions.Length == 0)
+            {
+                DrawRegions(people, new Bgr(Color.Green), 2);
+                return;
+            }
+
+            people = peopleDetector.Normalize(regions);
+
             // draw both region arrays on the image
-            foreach (MCvObjectDetection region in regions)
-            {
-                frame.Draw(region.Rect, new Bgr(Color.Blue), 1);
-            }
-            
-            foreach (MCvObjectDetection region in normalized)
-            {
-                frame.Draw(region.Rect, new Bgr(Color.Green), 2);
-            }
+            DrawRegions(regions, new Bgr(Color.Blue), 1);
+            DrawRegions(people, new Bgr(Color.LimeGreen), 2);
         }
 
         public BitmapImage GetFrame()
@@ -54,7 +57,29 @@ namespace RealStereo
 
             return ToBitmapImage(frame.ToBitmap());
         }
-        public BitmapImage ToBitmapImage(Bitmap bitmap)
+
+        public Point? GetCoordinates(Orientation orientation)
+        {
+            if (people == null || people.Length == 0)
+            {
+                return null;
+            }
+
+            Point point = new Point(0, 0);
+
+            if (orientation == Orientation.Horizontal)
+            {
+                point.X = people[0].Rect.X + people[0].Rect.Width / 2;
+            }
+            else if (orientation == Orientation.Vertical)
+            {
+                point.Y = people[0].Rect.X + people[0].Rect.Width / 2;
+            }
+
+            return point;
+        }
+
+        private BitmapImage ToBitmapImage(Bitmap bitmap)
         {
             using (MemoryStream stream = new MemoryStream())
             {
@@ -70,6 +95,19 @@ namespace RealStereo
                 result.Freeze();
 
                 return result;
+            }
+        }
+
+        private void DrawRegions(MCvObjectDetection[] regions, Bgr color, int thickness)
+        {
+            if (regions == null || regions.Length == 0)
+            {
+                return;
+            }
+
+            foreach (MCvObjectDetection region in regions)
+            {
+                frame.Draw(region.Rect, color, thickness);
             }
         }
     }

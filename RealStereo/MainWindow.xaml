@@ -29,5 +29,6 @@
         <ComboBox x:Name="camera2ComboBox" Grid.Column="1" HorizontalAlignment="Left" Margin="270,0,0,0" Grid.Row="1" VerticalAlignment="Center" Width="120" SelectionChanged="cameraComboBox_SelectionChanged" SelectedIndex="0">
             <System:String>None</System:String>
         </ComboBox>
+        <TextBlock Name="coordinatesTextBlock" Grid.Column="0" Grid.Row="1" />
     </Grid>
 </Window>
