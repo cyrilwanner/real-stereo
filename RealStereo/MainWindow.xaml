@@ -22,5 +22,6 @@
         <Border BorderThickness="0" Background="Black" Grid.Column="1" Grid.Row="0">
             <Image Name="camera2" />
         </Border>
+        <TextBlock Name="coordinatesTextBlock" Grid.Column="0" Grid.Row="1" />
     </Grid>
 </Window>

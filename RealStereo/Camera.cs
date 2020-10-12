@@ -1,10 +1,11 @@
 ﻿using Emgu.CV;
-using Emgu.CV.CvEnum;
 using Emgu.CV.Structure;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Windows.Controls;
 using System.Windows.Media.Imaging;
+using Inter = Emgu.CV.CvEnum.Inter;
 
 namespace RealStereo
 {
@@ -21,7 +22,7 @@ namespace RealStereo
             this.peopleDetector = peopleDetector;
         }
 
-        public MCvObjectDetection[] Process()
+        public void Process()
         {
             Mat rawFrame = capture.QueryFrame();
 
@@ -37,7 +38,7 @@ namespace RealStereo
             if (regions.Length == 0)
             {
                 DrawRegions(people, new Bgr(Color.Green), 2);
-                return people;
+                return;
             }
 
             people = peopleDetector.Normalize(regions);
@@ -45,8 +46,6 @@ namespace RealStereo
             // draw both region arrays on the image
             DrawRegions(regions, new Bgr(Color.Blue), 1);
             DrawRegions(people, new Bgr(Color.LimeGreen), 2);
-
-            return people;
         }
 
         public BitmapImage GetFrame()
@@ -57,6 +56,27 @@ namespace RealStereo
             }
 
             return ToBitmapImage(frame.ToBitmap());
+        }
+
+        public Point? GetCoordinates(Orientation orientation)
+        {
+            if (people == null || people.Length == 0)
+            {
+                return null;
+            }
+
+            Point point = new Point(0, 0);
+
+            if (orientation == Orientation.Horizontal)
+            {
+                point.X = people[0].Rect.X + people[0].Rect.Width / 2;
+            }
+            else if (orientation == Orientation.Vertical)
+            {
+                point.Y = people[0].Rect.X + people[0].Rect.Width / 2;
+            }
+
+            return point;
         }
 
         private BitmapImage ToBitmapImage(Bitmap bitmap)
