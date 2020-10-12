@@ -13,6 +13,7 @@ namespace RealStereo
         private VideoCapture capture;
         private PeopleDetector peopleDetector;
         private Image<Bgr, byte> frame;
+        private MCvObjectDetection[] people;
 
         public Camera(int cameraIndex, PeopleDetector peopleDetector)
         {
@@ -20,7 +21,7 @@ namespace RealStereo
             this.peopleDetector = peopleDetector;
         }
 
-        public void Process()
+        public MCvObjectDetection[] Process()
         {
             Mat rawFrame = capture.QueryFrame();
 
@@ -31,18 +32,21 @@ namespace RealStereo
 
             // detect people
             MCvObjectDetection[] regions = peopleDetector.Detect(frame);
-            MCvObjectDetection[] normalized = peopleDetector.Normalize(regions);
-            
+
+            // if no people got detected, assume they haven't moved and use the previous regions
+            if (regions.Length == 0)
+            {
+                DrawRegions(people, new Bgr(Color.Green), 2);
+                return people;
+            }
+
+            people = peopleDetector.Normalize(regions);
+
             // draw both region arrays on the image
-            foreach (MCvObjectDetection region in regions)
-            {
-                frame.Draw(region.Rect, new Bgr(Color.Blue), 1);
-            }
-            
-            foreach (MCvObjectDetection region in normalized)
-            {
-                frame.Draw(region.Rect, new Bgr(Color.Green), 2);
-            }
+            DrawRegions(regions, new Bgr(Color.Blue), 1);
+            DrawRegions(people, new Bgr(Color.LimeGreen), 2);
+
+            return people;
         }
 
         public BitmapImage GetFrame()
@@ -54,7 +58,8 @@ namespace RealStereo
 
             return ToBitmapImage(frame.ToBitmap());
         }
-        public BitmapImage ToBitmapImage(Bitmap bitmap)
+
+        private BitmapImage ToBitmapImage(Bitmap bitmap)
         {
             using (MemoryStream stream = new MemoryStream())
             {
@@ -70,6 +75,19 @@ namespace RealStereo
                 result.Freeze();
 
                 return result;
+            }
+        }
+
+        private void DrawRegions(MCvObjectDetection[] regions, Bgr color, int thickness)
+        {
+            if (regions == null || regions.Length == 0)
+            {
+                return;
+            }
+
+            foreach (MCvObjectDetection region in regions)
+            {
+                frame.Draw(region.Rect, color, thickness);
             }
         }
     }
