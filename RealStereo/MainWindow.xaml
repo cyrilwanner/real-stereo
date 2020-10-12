@@ -22,5 +22,7 @@
         <Border BorderThickness="0" Background="Black" Grid.Column="1" Grid.Row="0">
             <Image Name="camera2" />
         </Border>
+        <ComboBox Name="camera1ComboBox" Grid.Column="1" HorizontalAlignment="Left" Margin="107,0,0,0" Grid.Row="1" VerticalAlignment="Center" Width="120" SelectionChanged="camera1ComboBox_SelectionChanged"/>
+        <ComboBox Name="camera2ComboBox" Grid.Column="1" HorizontalAlignment="Left" Margin="270,0,0,0" Grid.Row="1" VerticalAlignment="Center" Width="120" SelectionChanged="camera2ComboBox_SelectionChanged"/>
     </Grid>
 </Window>

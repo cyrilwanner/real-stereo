@@ -1,6 +1,8 @@
-﻿using Emgu.CV;
+﻿using AForge.Video.DirectShow;
+using Emgu.CV;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Threading;
@@ -14,19 +16,28 @@ namespace RealStereo
     {
         private Dictionary<Image, Camera> cameras = new Dictionary<Image, Camera>();
         private DispatcherTimer timer;
+        private PeopleDetector peopleDetector;
+        private FilterInfoCollection videoDevices;
 
         public MainWindow()
         {
             InitializeComponent();
 
             // create HOG descriptor
-            PeopleDetector peopleDetector = new PeopleDetector();
+            peopleDetector = new PeopleDetector();
 
-            // register cameras
-            cameras.Add(camera1, new Camera(0, peopleDetector));
-            cameras.Add(camera2, new Camera(1, peopleDetector));
-
+            Loaded += new RoutedEventHandler(LoadCameras);
             Loaded += new RoutedEventHandler(StartCameras);
+        }
+
+        private void LoadCameras(object sender, RoutedEventArgs e)
+        {
+            videoDevices = new FilterInfoCollection(FilterCategory.VideoInputDevice);
+            foreach (FilterInfo camera in videoDevices)
+            {
+                camera1ComboBox.Items.Add(camera.Name);
+                camera2ComboBox.Items.Add(camera.Name);
+            }
         }
 
         private void StartCameras(object sender, RoutedEventArgs e)
@@ -44,6 +55,32 @@ namespace RealStereo
                 entry.Value.Process();
                 entry.Key.Source = entry.Value.GetFrame();
             }
+        }
+
+        private void camera1ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var device = videoDevices
+                .OfType<FilterInfo>()
+                .Select((Value, Index) => new { Value, Index })
+                .Single(i => i.Value.Name == e.AddedItems[0] as string);
+
+            camera2ComboBox.Items.Clear();
+            LoadCameras(null, null);
+            camera2ComboBox.Items.RemoveAt(device.Index);
+            cameras[camera1] = new Camera(device.Index, peopleDetector);
+        }
+
+        private void camera2ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var device = videoDevices
+                .OfType<FilterInfo>()
+                .Select((Value, Index) => new { Value, Index })
+                .Single(i => i.Value.Name == e.AddedItems[0] as string);
+
+            camera1ComboBox.Items.Clear();
+            LoadCameras(null, null);
+            camera1ComboBox.Items.RemoveAt(device.Index);
+            cameras[camera2] = new Camera(device.Index, peopleDetector);
         }
     }
 }
