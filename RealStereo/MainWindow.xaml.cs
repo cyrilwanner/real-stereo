@@ -1,4 +1,5 @@
 using AForge.Video.DirectShow;
+using NAudio.CoreAudioApi;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,14 +29,8 @@ namespace RealStereo
             // create HOG descriptor
             peopleDetector = new PeopleDetector();
 
-            Loaded += new RoutedEventHandler(LoadAudioDevices);
             Loaded += new RoutedEventHandler(LoadCameras);
             Loaded += new RoutedEventHandler(StartCameras);
-        }
-
-        private void LoadAudioDevices(object sender, RoutedEventArgs e)
-        {
-
         }
 
         private void LoadCameras(object sender, RoutedEventArgs e)
@@ -104,6 +99,37 @@ namespace RealStereo
             {
                 cameras.Remove(camera);
                 camera.Source = null;
+            }
+        }
+
+        private void audioDeviceComboBox_DropDownOpened(object sender, EventArgs e)
+        {
+            MMDeviceEnumerator audioDeviceEnumerator = new MMDeviceEnumerator();
+            MMDeviceCollection audioDeviceCollection;
+            ComboBox comboBox = (ComboBox)sender;
+
+            if (comboBox == audioOutputComboBox)
+            {
+                audioDeviceCollection = audioDeviceEnumerator.EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active);
+            } else
+            {
+                audioDeviceCollection = audioDeviceEnumerator.EnumerateAudioEndPoints(DataFlow.Capture, DeviceState.Active);
+            }
+
+            object selectedItem = comboBox.SelectedItem;
+            comboBox.Items.Clear();
+            comboBox.Items.Add("None");
+            foreach (MMDevice audioDevice in audioDeviceCollection)
+            {
+                comboBox.Items.Add(audioDevice);
+                if (selectedItem.ToString() == audioDevice.ToString())
+                {
+                    comboBox.SelectedItem = audioDevice;
+                }
+            }
+            if (comboBox.SelectedItem == null)
+            {
+                comboBox.SelectedIndex = 0;
             }
         }
     }

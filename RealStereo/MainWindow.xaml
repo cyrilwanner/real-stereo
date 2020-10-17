@@ -36,22 +36,28 @@
 
             <StackPanel Grid.Column="0" Grid.Row="0">
                 <Label x:Name="camera1Label" Content="Camera 1"/>
-                <ComboBox x:Name="camera1ComboBox" HorizontalAlignment="Left" VerticalAlignment="Center" Width="120" SelectionChanged="cameraComboBox_SelectionChanged" SelectedIndex="0">
+                <ComboBox x:Name="camera1ComboBox" HorizontalAlignment="Left" VerticalAlignment="Center" Width="175" SelectionChanged="cameraComboBox_SelectionChanged" SelectedIndex="0">
                     <System:String>None</System:String>
                 </ComboBox>
             </StackPanel>
             <StackPanel Grid.Column="1" Grid.Row="0">
                 <Label x:Name="camera2Label" Content="Camera 2"/>
-                <ComboBox x:Name="camera2ComboBox" Grid.Column="1" HorizontalAlignment="Left" Grid.Row="0" VerticalAlignment="Center" Width="120" SelectionChanged="cameraComboBox_SelectionChanged" SelectedIndex="0">
+                <ComboBox x:Name="camera2ComboBox" HorizontalAlignment="Left" VerticalAlignment="Center" Width="175" SelectionChanged="cameraComboBox_SelectionChanged" SelectedIndex="0">
                     <System:String>None</System:String>
                 </ComboBox>
             </StackPanel>
 
             <StackPanel Grid.Column="0" Grid.Row="1">
                 <Label x:Name="audioInputDeviceLabel" Content="Audio Input Device (Mic)"/>
+                <ComboBox x:Name="audioInputComboBox" HorizontalAlignment="Left" VerticalAlignment="Center" Width="175" SelectedIndex="0" DropDownOpened="audioDeviceComboBox_DropDownOpened">
+                    <System:String>None</System:String>
+                </ComboBox>
             </StackPanel>
             <StackPanel Grid.Column="1" Grid.Row="1">
                 <Label x:Name="audioOutputDeviceLabel" Content="Audio Output Device (Speaker)"/>
+                <ComboBox x:Name="audioOutputComboBox" HorizontalAlignment="Left" VerticalAlignment="Center" Width="175" SelectedIndex="0" DropDownOpened="audioDeviceComboBox_DropDownOpened">
+                    <System:String>None</System:String>
+                </ComboBox>
             </StackPanel>
         </Grid>
     </Grid>
