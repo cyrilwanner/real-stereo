@@ -49,13 +49,13 @@
 
             <StackPanel Grid.Column="0" Grid.Row="1">
                 <Label x:Name="audioInputDeviceLabel" Content="Audio Input Device (Mic)"/>
-                <ComboBox x:Name="audioInputComboBox" HorizontalAlignment="Left" VerticalAlignment="Center" Width="175" SelectedIndex="0" DropDownOpened="audioDeviceComboBox_DropDownOpened">
+                <ComboBox x:Name="audioInputComboBox" HorizontalAlignment="Left" VerticalAlignment="Center" Width="175" SelectedIndex="0" DropDownOpened="audioDeviceComboBox_DropDownOpened" SelectionChanged="audioDeviceComboBox_SelectionChanged">
                     <System:String>None</System:String>
                 </ComboBox>
             </StackPanel>
             <StackPanel Grid.Column="1" Grid.Row="1">
                 <Label x:Name="audioOutputDeviceLabel" Content="Audio Output Device (Speaker)"/>
-                <ComboBox x:Name="audioOutputComboBox" HorizontalAlignment="Left" VerticalAlignment="Center" Width="175" SelectedIndex="0" DropDownOpened="audioDeviceComboBox_DropDownOpened">
+                <ComboBox x:Name="audioOutputComboBox" HorizontalAlignment="Left" VerticalAlignment="Center" Width="175" SelectedIndex="0" DropDownOpened="audioDeviceComboBox_DropDownOpened" SelectionChanged="audioDeviceComboBox_SelectionChanged">
                     <System:String>None</System:String>
                 </ComboBox>
             </StackPanel>
