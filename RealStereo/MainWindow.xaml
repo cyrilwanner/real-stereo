@@ -46,6 +46,13 @@
                     <System:String>None</System:String>
                 </ComboBox>
             </StackPanel>
+
+            <StackPanel Grid.Column="0" Grid.Row="1">
+                <Label x:Name="audioInputDeviceLabel" Content="Audio Input Device (Mic)"/>
+            </StackPanel>
+            <StackPanel Grid.Column="1" Grid.Row="1">
+                <Label x:Name="audioOutputDeviceLabel" Content="Audio Output Device (Speaker)"/>
+            </StackPanel>
         </Grid>
     </Grid>
 </Window>

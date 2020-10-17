@@ -1,5 +1,4 @@
 using AForge.Video.DirectShow;
-using Emgu.CV;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,8 +28,14 @@ namespace RealStereo
             // create HOG descriptor
             peopleDetector = new PeopleDetector();
 
+            Loaded += new RoutedEventHandler(LoadAudioDevices);
             Loaded += new RoutedEventHandler(LoadCameras);
             Loaded += new RoutedEventHandler(StartCameras);
+        }
+
+        private void LoadAudioDevices(object sender, RoutedEventArgs e)
+        {
+
         }
 
         private void LoadCameras(object sender, RoutedEventArgs e)
