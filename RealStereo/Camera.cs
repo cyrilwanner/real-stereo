@@ -28,7 +28,7 @@ namespace RealStereo
 
             // resize image for more performant detection
             frame = rawFrame.ToImage<Bgr, byte>();
-            double ratio = 400.0 / frame.Width;
+            double ratio = 500.0 / frame.Width;
             frame = frame.Resize((int) (frame.Width * ratio), (int) (frame.Height * ratio), Inter.Cubic);
 
             // detect people

@@ -10,6 +10,7 @@ namespace RealStereo
     class PeopleDetector
     {
         private HOGDescriptor hogDescriptor;
+        private static int GROUP_THRESHOLD = 50;
 
         public PeopleDetector()
         {
@@ -19,7 +20,7 @@ namespace RealStereo
 
         public MCvObjectDetection[] Detect(Image<Bgr, byte> frame)
         {
-            return hogDescriptor.DetectMultiScale(frame, 0, new Size(4, 4), new Size(8, 8));
+            return hogDescriptor.DetectMultiScale(frame, 0, new Size(2, 2), new Size(8, 8));
         }
 
         public MCvObjectDetection[] Normalize(MCvObjectDetection[] regions)
@@ -37,8 +38,10 @@ namespace RealStereo
                 bool intersects = false;
                 for (int i = 0; i < results.Count; i++)
                 {
+                    // enlarge rect to group close ones
                     MCvObjectDetection result = results[i];
-                    if (region.Rect.IntersectsWith(result.Rect))
+                    Rectangle enlargedResult = new Rectangle(result.Rect.X - GROUP_THRESHOLD, result.Rect.Y - GROUP_THRESHOLD, result.Rect.Width + GROUP_THRESHOLD * 2, result.Rect.Height + GROUP_THRESHOLD * 2);
+                    if (region.Rect.IntersectsWith(enlargedResult))
                     {
                         intersects = true;
                         int maxRight = Math.Max(result.Rect.Right, region.Rect.Right);
