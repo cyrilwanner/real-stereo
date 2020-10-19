@@ -214,5 +214,15 @@ namespace RealStereo
                 // Input device
             }
         }
+
+        private void EditConfiguration(object sender, RoutedEventArgs e)
+        {
+            ConfigurationWindow window = new ConfigurationWindow();
+            window.WindowStartupLocation = WindowStartupLocation.Manual;
+            window.Left = Left + Width;
+            window.Top = Top;
+            window.Height = Height;
+            window.ShowDialog();
+        }
     }
 }
