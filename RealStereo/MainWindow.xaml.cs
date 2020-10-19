@@ -21,6 +21,7 @@ namespace RealStereo
         private PeopleDetector peopleDetector;
         private FilterInfoCollection videoDevices;
         private Dictionary<string, int> videoDeviceNameIndexDictionary = new Dictionary<string, int>();
+        private bool isBalancing = false;
 
         public MainWindow()
         {
@@ -44,6 +45,12 @@ namespace RealStereo
             }
         }
 
+        private void ToggleBalancing(object sender, RoutedEventArgs e)
+        {
+
+            isBalancing = !isBalancing;
+        }
+
         private void StartCameras(object sender, RoutedEventArgs e)
         {
             timer = new DispatcherTimer();
@@ -61,7 +68,7 @@ namespace RealStereo
                 Image image = cameras.Keys.ElementAt(i);
                 Camera camera = cameras[image];
 
-                camera.Process();
+                camera.Process(isBalancing);
                 image.Source = camera.GetFrame();
                 Point? cameraCoordinates = camera.GetCoordinates(i % 2 == 0 ? Orientation.Horizontal : Orientation.Vertical);
 
