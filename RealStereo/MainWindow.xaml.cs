@@ -136,7 +136,7 @@ namespace RealStereo
         private void audioDeviceComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             ComboBox comboBox = (ComboBox)sender;
-            MMDevice audioDevice = e.AddedItems[0] is MMDevice ? (MMDevice)e.AddedItems[0] : null;
+            MMDevice audioDevice = e.AddedItems.Count > 0 && e.AddedItems[0] is MMDevice ? (MMDevice)e.AddedItems[0] : null;
 
             if (comboBox == audioOutputComboBox)
             {
