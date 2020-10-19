@@ -1,5 +1,5 @@
 using AForge.Video.DirectShow;
-using Emgu.CV;
+using NAudio.CoreAudioApi;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -99,6 +99,51 @@ namespace RealStereo
             {
                 cameras.Remove(camera);
                 camera.Source = null;
+            }
+        }
+
+        private void audioDeviceComboBox_DropDownOpened(object sender, EventArgs e)
+        {
+            MMDeviceEnumerator audioDeviceEnumerator = new MMDeviceEnumerator();
+            MMDeviceCollection audioDeviceCollection;
+            ComboBox comboBox = (ComboBox)sender;
+
+            if (comboBox == audioOutputComboBox)
+            {
+                audioDeviceCollection = audioDeviceEnumerator.EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active);
+            } else
+            {
+                audioDeviceCollection = audioDeviceEnumerator.EnumerateAudioEndPoints(DataFlow.Capture, DeviceState.Active);
+            }
+
+            object selectedItem = comboBox.SelectedItem;
+            comboBox.Items.Clear();
+            comboBox.Items.Add("None");
+            foreach (MMDevice audioDevice in audioDeviceCollection)
+            {
+                comboBox.Items.Add(audioDevice);
+                if (selectedItem.ToString() == audioDevice.ToString())
+                {
+                    comboBox.SelectedItem = audioDevice;
+                }
+            }
+            if (comboBox.SelectedItem == null)
+            {
+                comboBox.SelectedIndex = 0;
+            }
+        }
+
+        private void audioDeviceComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            ComboBox comboBox = (ComboBox)sender;
+            MMDevice audioDevice = e.AddedItems.Count > 0 && e.AddedItems[0] is MMDevice ? (MMDevice)e.AddedItems[0] : null;
+
+            if (comboBox == audioOutputComboBox)
+            {
+                //Output device
+            } else
+            {
+                // Input device
             }
         }
     }

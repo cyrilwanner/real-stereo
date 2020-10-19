@@ -23,12 +23,42 @@
         <Border BorderThickness="0" Background="Black" Grid.Column="1" Grid.Row="0">
             <Image x:Name="camera2" />
         </Border>
-        <ComboBox x:Name="camera1ComboBox" Grid.Column="1" HorizontalAlignment="Left" Margin="107,0,0,0" Grid.Row="1" VerticalAlignment="Center" Width="120" SelectionChanged="cameraComboBox_SelectionChanged" SelectedIndex="0">
-            <System:String>None</System:String>
-        </ComboBox>
-        <ComboBox x:Name="camera2ComboBox" Grid.Column="1" HorizontalAlignment="Left" Margin="270,0,0,0" Grid.Row="1" VerticalAlignment="Center" Width="120" SelectionChanged="cameraComboBox_SelectionChanged" SelectedIndex="0">
-            <System:String>None</System:String>
-        </ComboBox>
         <TextBlock Name="coordinatesTextBlock" Grid.Column="0" Grid.Row="1" />
+        <Grid Grid.Column="1" Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*" />
+                <ColumnDefinition Width="1*" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="1*" />
+                <RowDefinition Height="1*" />
+            </Grid.RowDefinitions>
+
+            <StackPanel Grid.Column="0" Grid.Row="0">
+                <Label x:Name="camera1Label" Content="Camera 1"/>
+                <ComboBox x:Name="camera1ComboBox" HorizontalAlignment="Left" VerticalAlignment="Center" Width="175" SelectionChanged="cameraComboBox_SelectionChanged" SelectedIndex="0">
+                    <System:String>None</System:String>
+                </ComboBox>
+            </StackPanel>
+            <StackPanel Grid.Column="1" Grid.Row="0">
+                <Label x:Name="camera2Label" Content="Camera 2"/>
+                <ComboBox x:Name="camera2ComboBox" HorizontalAlignment="Left" VerticalAlignment="Center" Width="175" SelectionChanged="cameraComboBox_SelectionChanged" SelectedIndex="0">
+                    <System:String>None</System:String>
+                </ComboBox>
+            </StackPanel>
+
+            <StackPanel Grid.Column="0" Grid.Row="1">
+                <Label x:Name="audioInputDeviceLabel" Content="Audio Input Device (Mic)"/>
+                <ComboBox x:Name="audioInputComboBox" HorizontalAlignment="Left" VerticalAlignment="Center" Width="175" SelectedIndex="0" DropDownOpened="audioDeviceComboBox_DropDownOpened" SelectionChanged="audioDeviceComboBox_SelectionChanged">
+                    <System:String>None</System:String>
+                </ComboBox>
+            </StackPanel>
+            <StackPanel Grid.Column="1" Grid.Row="1">
+                <Label x:Name="audioOutputDeviceLabel" Content="Audio Output Device (Speaker)"/>
+                <ComboBox x:Name="audioOutputComboBox" HorizontalAlignment="Left" VerticalAlignment="Center" Width="175" SelectedIndex="0" DropDownOpened="audioDeviceComboBox_DropDownOpened" SelectionChanged="audioDeviceComboBox_SelectionChanged">
+                    <System:String>None</System:String>
+                </ComboBox>
+            </StackPanel>
+        </Grid>
     </Grid>
 </Window>
