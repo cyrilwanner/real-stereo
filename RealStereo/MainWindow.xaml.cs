@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 using System.Windows.Threading;
 using Image = System.Windows.Controls.Image;
 using Point = System.Drawing.Point;
@@ -85,6 +86,47 @@ namespace RealStereo
             coordinatesTextBlock.Text = "Point(" + coordinates.X + ", " + coordinates.Y + ")";
         }
 
+        private void UpdateChannelLevels()
+        {
+            if (channelLevelsPanel == null)
+            {
+                return;
+            }
+
+            channelLevelsPanel.Children.Clear();
+
+            if (audioOutputComboBox.SelectedItem is MMDevice)
+            {
+                MMDevice audioOut = (MMDevice) audioOutputComboBox.SelectedItem;
+
+                for (int channelIndex = 0; channelIndex < audioOut.AudioEndpointVolume.Channels.Count; channelIndex++)
+                {
+                    Label label = new Label();
+                    label.Content = "Channel " + (channelIndex + 1);
+                    label.Margin = new Thickness(0, channelIndex > 0 ? 5 : 0, 0, 0);
+                    channelLevelsPanel.Children.Add(label);
+
+                    ProgressBar progressBar = new ProgressBar();
+                    progressBar.Value = audioOut.AudioEndpointVolume.Channels[channelIndex].VolumeLevelScalar * 100;
+
+                    if (progressBar.Value > 90)
+                    {
+                        progressBar.Foreground = Brushes.Red;
+                    }
+                    else if (progressBar.Value > 70)
+                    {
+                        progressBar.Foreground = Brushes.Orange;
+                    }
+                    else
+                    {
+                        progressBar.Foreground = Brushes.Green;
+                    }
+
+                    channelLevelsPanel.Children.Add(progressBar);
+                }
+            }
+        }
+
         private void cameraComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             ComboBox comboBox = sender as ComboBox;
@@ -147,8 +189,9 @@ namespace RealStereo
 
             if (comboBox == audioOutputComboBox)
             {
-                //Output device
-            } else
+                UpdateChannelLevels();
+            }
+            else
             {
                 // Input device
             }

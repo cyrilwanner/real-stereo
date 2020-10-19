@@ -87,22 +87,7 @@
                     <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ActiveBorderColorKey}}"/>
                 </Border.BorderBrush>
                 <ScrollViewer Padding="10,0,10,10">
-                    <StackPanel>
-                        <Label Content="Speaker 1"/>
-                        <ProgressBar Value="50" />
-                        <Label Content="Speaker 1" Margin="0,5,0,0"/>
-                        <ProgressBar Value="50" />
-                        <Label Content="Speaker 1" Margin="0,5,0,0"/>
-                        <ProgressBar Value="50" />
-                        <Label Content="Speaker 1" Margin="0,5,0,0"/>
-                        <ProgressBar Value="50" />
-                        <Label Content="Speaker 1" Margin="0,5,0,0"/>
-                        <ProgressBar Value="50" />
-                        <Label Content="Speaker 1" Margin="0,5,0,0"/>
-                        <ProgressBar Value="50" />
-                        <Label Content="Speaker 1" Margin="0,5,0,0"/>
-                        <ProgressBar Value="50" />
-                    </StackPanel>
+                    <StackPanel x:Name="channelLevelsPanel" />
                 </ScrollViewer>
             </Border>
         </Grid>
