@@ -50,6 +50,8 @@ namespace RealStereo
         {
 
             isBalancing = !isBalancing;
+
+            startBalancingButton.Content = (isBalancing ? "Stop" : "Start") + " Balancing";
         }
 
         private void StartCameras(object sender, RoutedEventArgs e)
@@ -86,7 +88,7 @@ namespace RealStereo
             coordinatesTextBlock.Text = "Point(" + coordinates.X + ", " + coordinates.Y + ")";
         }
 
-        private void UpdateChannelLevels()
+        private void UpdateChannelLevelList()
         {
             if (channelLevelsPanel == null)
             {
@@ -108,12 +110,30 @@ namespace RealStereo
 
                     ProgressBar progressBar = new ProgressBar();
                     progressBar.Value = audioOut.AudioEndpointVolume.Channels[channelIndex].VolumeLevelScalar * 100;
+                    channelLevelsPanel.Children.Add(progressBar);
+                }
+            }
 
-                    if (progressBar.Value > 90)
+            UpdateChannelLevels();
+        }
+
+        private void UpdateChannelLevels()
+        {
+            if (audioOutputComboBox.SelectedItem is MMDevice)
+            {
+                MMDevice audioOut = (MMDevice)audioOutputComboBox.SelectedItem;
+
+                for (int channelIndex = 0; channelIndex < audioOut.AudioEndpointVolume.Channels.Count; channelIndex++)
+                {
+                    ProgressBar progressBar = (ProgressBar) VisualTreeHelper.GetChild(channelLevelsPanel, channelIndex * 2 + 1);
+
+                    progressBar.Value = audioOut.AudioEndpointVolume.Channels[channelIndex].VolumeLevelScalar * 100;
+
+                    if (progressBar.Value >= 90)
                     {
                         progressBar.Foreground = Brushes.Red;
                     }
-                    else if (progressBar.Value > 70)
+                    else if (progressBar.Value >= 70)
                     {
                         progressBar.Foreground = Brushes.Orange;
                     }
@@ -121,8 +141,6 @@ namespace RealStereo
                     {
                         progressBar.Foreground = Brushes.Green;
                     }
-
-                    channelLevelsPanel.Children.Add(progressBar);
                 }
             }
         }
@@ -189,7 +207,7 @@ namespace RealStereo
 
             if (comboBox == audioOutputComboBox)
             {
-                UpdateChannelLevels();
+                UpdateChannelLevelList();
             }
             else
             {
