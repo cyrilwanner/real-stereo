@@ -1,5 +1,6 @@
 ﻿using Emgu.CV;
 using Emgu.CV.Structure;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
@@ -15,6 +16,7 @@ namespace RealStereo
         private PeopleDetector peopleDetector;
         private Image<Bgr, byte> frame;
         private MCvObjectDetection[] people;
+        private List<MCvObjectDetection[]> history = new List<MCvObjectDetection[]>();
 
         public Camera(int cameraIndex, PeopleDetector peopleDetector)
         {
@@ -46,7 +48,8 @@ namespace RealStereo
                 return;
             }
 
-            people = peopleDetector.Normalize(regions);
+            people = peopleDetector.Normalize(regions, people, history);
+            peopleDetector.RotateHistory(regions, ref history);
 
             // draw both region arrays on the image
             DrawRegions(regions, new Bgr(Color.Blue), 1);
