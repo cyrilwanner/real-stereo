@@ -22,7 +22,7 @@ namespace RealStereo
             this.peopleDetector = peopleDetector;
         }
 
-        public void Process()
+        public void Process(bool detectPeople)
         {
             Mat rawFrame = capture.QueryFrame();
 
@@ -30,6 +30,11 @@ namespace RealStereo
             frame = rawFrame.ToImage<Bgr, byte>();
             double ratio = 500.0 / frame.Width;
             frame = frame.Resize((int) (frame.Width * ratio), (int) (frame.Height * ratio), Inter.Cubic);
+
+            if (!detectPeople)
+            {
+                return;
+            }
 
             // detect people
             MCvObjectDetection[] regions = peopleDetector.Detect(frame);

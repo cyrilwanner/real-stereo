@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:RealStereo"
         xmlns:System="clr-namespace:System;assembly=System.Runtime" x:Class="RealStereo.MainWindow"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="Real Stereo" Height="450" Width="800">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="1*" />
@@ -14,51 +14,82 @@
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
-            <RowDefinition Height="100" />
+            <RowDefinition Height="150" />
         </Grid.RowDefinitions>
 
-        <Border BorderThickness="0" Background="Black" Grid.Column="0" Grid.Row="0">
+        <!-- Webcam Preview 1 -->
+        <Border Grid.Column="0" Grid.Row="0" BorderThickness="0" Background="Black">
             <Image x:Name="camera1" />
         </Border>
-        <Border BorderThickness="0" Background="Black" Grid.Column="1" Grid.Row="0">
+
+        <!-- Webcam Preview 2 -->
+        <Border Grid.Column="1" Grid.Row="0" BorderThickness="0" Background="Black">
             <Image x:Name="camera2" />
         </Border>
-        <TextBlock Name="coordinatesTextBlock" Grid.Column="0" Grid.Row="1" />
-        <Grid Grid.Column="1" Grid.Row="1">
+
+        <!-- Temporary coordinates display -->
+        <TextBlock Grid.Column="0" Grid.Row="0" x:Name="coordinatesTextBlock" Background="White" Width="100" Height="20" HorizontalAlignment="Left" VerticalAlignment="Top" />
+
+        <!-- Bottom row: configuration section -->
+        <Grid Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2">
             <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*" />
+                <ColumnDefinition Width="1*" />
                 <ColumnDefinition Width="1*" />
                 <ColumnDefinition Width="1*" />
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
                 <RowDefinition Height="1*" />
-                <RowDefinition Height="1*" />
             </Grid.RowDefinitions>
 
-            <StackPanel Grid.Column="0" Grid.Row="0">
+            <!-- Left column: room configuration -->
+            <Border Grid.Column="0" Grid.Row="0" Grid.RowSpan="2" BorderThickness="0,0,1,0" Margin="0,0,10,0" Padding="10,0,10,10">
+                <Border.BorderBrush>
+                    <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ActiveBorderColorKey}}"/>
+                </Border.BorderBrush>
+                <DockPanel>
+                    <StackPanel DockPanel.Dock="Top">
+                        <Label x:Name="roomConfigLabel" Content="Select room configuration"/>
+                        <ComboBox x:Name="roomComboBox" SelectedIndex="0">
+                            <System:String>Default</System:String>
+                        </ComboBox>
+                        <Button x:Name="editConfigButton" Content="Edit configuration" Margin="0,10,0,0" Click="EditConfiguration" />
+                    </StackPanel>
+                    <Button DockPanel.Dock="Bottom" x:Name="startBalancingButton" Content="Start Balancing" VerticalAlignment="Bottom" FontWeight="Bold" Click="ToggleBalancing" />
+                </DockPanel>
+            </Border>
+
+            <!-- Center column: device selection -->
+            <StackPanel Grid.Column="1" Grid.Row="0" Margin="0,0,5,0">
                 <Label x:Name="camera1Label" Content="Camera 1"/>
-                <ComboBox x:Name="camera1ComboBox" HorizontalAlignment="Left" VerticalAlignment="Center" Width="175" SelectionChanged="cameraComboBox_SelectionChanged" SelectedIndex="0">
+                <ComboBox x:Name="camera1ComboBox" SelectedIndex="0" SelectionChanged="cameraComboBox_SelectionChanged">
+                    <System:String>None</System:String>
+                </ComboBox>
+                <Label x:Name="audioInputDeviceLabel" Content="Audio Input Device (Mic)" Margin="0,5,0,0" />
+                <ComboBox x:Name="audioInputComboBox" SelectedIndex="0" DropDownOpened="audioDeviceComboBox_DropDownOpened" SelectionChanged="audioDeviceComboBox_SelectionChanged">
                     <System:String>None</System:String>
                 </ComboBox>
             </StackPanel>
-            <StackPanel Grid.Column="1" Grid.Row="0">
+            <StackPanel Grid.Column="2" Grid.Row="0" Margin="5,0,0,0">
                 <Label x:Name="camera2Label" Content="Camera 2"/>
-                <ComboBox x:Name="camera2ComboBox" HorizontalAlignment="Left" VerticalAlignment="Center" Width="175" SelectionChanged="cameraComboBox_SelectionChanged" SelectedIndex="0">
+                <ComboBox x:Name="camera2ComboBox" SelectedIndex="0" SelectionChanged="cameraComboBox_SelectionChanged">
+                    <System:String>None</System:String>
+                </ComboBox>
+                <Label x:Name="audioOutputDeviceLabel" Content="Audio Output Device (Speaker)"  Margin="0,5,0,0" />
+                <ComboBox x:Name="audioOutputComboBox" SelectedIndex="0" DropDownOpened="audioDeviceComboBox_DropDownOpened" SelectionChanged="audioDeviceComboBox_SelectionChanged">
                     <System:String>None</System:String>
                 </ComboBox>
             </StackPanel>
 
-            <StackPanel Grid.Column="0" Grid.Row="1">
-                <Label x:Name="audioInputDeviceLabel" Content="Audio Input Device (Mic)"/>
-                <ComboBox x:Name="audioInputComboBox" HorizontalAlignment="Left" VerticalAlignment="Center" Width="175" SelectedIndex="0" DropDownOpened="audioDeviceComboBox_DropDownOpened" SelectionChanged="audioDeviceComboBox_SelectionChanged">
-                    <System:String>None</System:String>
-                </ComboBox>
-            </StackPanel>
-            <StackPanel Grid.Column="1" Grid.Row="1">
-                <Label x:Name="audioOutputDeviceLabel" Content="Audio Output Device (Speaker)"/>
-                <ComboBox x:Name="audioOutputComboBox" HorizontalAlignment="Left" VerticalAlignment="Center" Width="175" SelectedIndex="0" DropDownOpened="audioDeviceComboBox_DropDownOpened" SelectionChanged="audioDeviceComboBox_SelectionChanged">
-                    <System:String>None</System:String>
-                </ComboBox>
-            </StackPanel>
+            <!-- Right column: channel levels -->
+            <Border Grid.Column="3" Grid.Row="0" Grid.RowSpan="2" BorderThickness="1,0,0,0" Margin="10,0,0,0">
+                <Border.BorderBrush>
+                    <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.ActiveBorderColorKey}}"/>
+                </Border.BorderBrush>
+                <ScrollViewer Padding="10,0,10,10" VerticalScrollBarVisibility="Auto">
+                    <StackPanel x:Name="channelLevelsPanel" />
+                </ScrollViewer>
+            </Border>
         </Grid>
     </Grid>
 </Window>
