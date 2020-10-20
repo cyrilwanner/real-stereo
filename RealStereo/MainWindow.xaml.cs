@@ -40,9 +40,19 @@ namespace RealStereo
             videoDevices = new FilterInfoCollection(FilterCategory.VideoInputDevice);
             for (int i = 0; i < videoDevices.Count; i++)
             {
-                videoDeviceNameIndexDictionary.Add(videoDevices[i].Name, i);
-                camera1ComboBox.Items.Add(new string(videoDevices[i].Name));
-                camera2ComboBox.Items.Add(new string(videoDevices[i].Name));
+                String deviceName = videoDevices[i].Name;
+                String initialDeviceName = deviceName;
+                int deviceNumber = 1;
+
+                while (videoDeviceNameIndexDictionary.ContainsKey(deviceName))
+                {
+                    deviceNumber++;
+                    deviceName = initialDeviceName + " " + deviceNumber;
+                }
+
+                videoDeviceNameIndexDictionary.Add(deviceName, i);
+                camera1ComboBox.Items.Add(new string(deviceName));
+                camera2ComboBox.Items.Add(new string(deviceName));
             }
         }
 
