@@ -48,8 +48,13 @@ namespace RealStereo
                 return;
             }
 
-            people = peopleDetector.Normalize(regions, people, history);
+            MCvObjectDetection[] updatedPeople = peopleDetector.Normalize(regions, people, history);
             peopleDetector.RotateHistory(regions, ref history);
+
+            if (updatedPeople.Length > 0)
+            {
+                people = updatedPeople;
+            }
 
             // draw both region arrays on the image
             DrawRegions(regions, new Bgr(Color.Blue), 1);
