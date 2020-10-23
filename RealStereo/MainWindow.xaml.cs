@@ -75,6 +75,7 @@ namespace RealStereo
         private void UpdateCoordinates(object sender, EventArgs e)
         {
             Point coordinates = new Point(0, 0);
+            bool applyCoordinates = true;
 
             for (int i = 0; i < cameras.Keys.Count; i++)
             {
@@ -88,14 +89,18 @@ namespace RealStereo
                 // if a camera is not ready or didn't detect a person, cancel coordinates calculation
                 if (cameraCoordinates == null)
                 {
-                    return;
+                    applyCoordinates = false;
+                    continue;
                 }
 
                 coordinates.X = Math.Max(coordinates.X, cameraCoordinates.Value.X);
                 coordinates.Y = Math.Max(coordinates.Y, cameraCoordinates.Value.Y);
             }
 
-            coordinatesTextBlock.Text = "Point(" + coordinates.X + ", " + coordinates.Y + ")";
+            if (applyCoordinates)
+            {
+                coordinatesTextBlock.Text = "Point(" + coordinates.X + ", " + coordinates.Y + ")";
+            }
         }
 
         private void UpdateChannelLevelList()
