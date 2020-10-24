@@ -62,7 +62,7 @@
             <!-- Center column: device selection -->
             <StackPanel Grid.Column="1" Grid.Row="0" Margin="0,0,5,0">
                 <Label x:Name="camera1Label" Content="Camera 1"/>
-                <ComboBox x:Name="camera1ComboBox" SelectedIndex="0" SelectionChanged="cameraComboBox_SelectionChanged">
+                <ComboBox x:Name="camera1ComboBox" SelectedIndex="0" DropDownOpened="cameraComboBox_DropDownOpened" SelectionChanged="cameraComboBox_SelectionChanged">
                     <System:String>None</System:String>
                 </ComboBox>
                 <Label x:Name="audioInputDeviceLabel" Content="Audio Input Device (Mic)" Margin="0,5,0,0" />
@@ -72,7 +72,7 @@
             </StackPanel>
             <StackPanel Grid.Column="2" Grid.Row="0" Margin="5,0,0,0">
                 <Label x:Name="camera2Label" Content="Camera 2"/>
-                <ComboBox x:Name="camera2ComboBox" SelectedIndex="0" SelectionChanged="cameraComboBox_SelectionChanged">
+                <ComboBox x:Name="camera2ComboBox" SelectedIndex="0" DropDownOpened="cameraComboBox_DropDownOpened" SelectionChanged="cameraComboBox_SelectionChanged">
                     <System:String>None</System:String>
                 </ComboBox>
                 <Label x:Name="audioOutputDeviceLabel" Content="Audio Output Device (Speaker)"  Margin="0,5,0,0" />
