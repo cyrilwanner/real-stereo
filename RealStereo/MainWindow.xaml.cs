@@ -119,7 +119,13 @@ namespace RealStereo
                 for (int channelIndex = 0; channelIndex < audioOut.AudioEndpointVolume.Channels.Count; channelIndex++)
                 {
                     Label label = new Label();
-                    label.Content = "Channel " + (channelIndex + 1);
+                    if (AudioChannelMap.Map.ContainsKey(channelIndex))
+                    {
+                        label.Content = AudioChannelMap.Map[channelIndex];
+                    } else
+                    {
+                        label.Content = "Channel " + (channelIndex + 1);
+                    }
                     label.Margin = new Thickness(0, channelIndex > 0 ? 5 : 0, 0, 0);
                     channelLevelsPanel.Children.Add(label);
 
