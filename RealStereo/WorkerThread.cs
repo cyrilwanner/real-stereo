@@ -15,6 +15,7 @@ namespace RealStereo
         private Thread thread;
         private Dictionary<Image, Camera> cameras;
         private bool isBalancing = false;
+        private bool cancelled = false;
 
         private static int FPS = 10;
 
@@ -33,6 +34,12 @@ namespace RealStereo
             this.isBalancing = isBalancing;
         }
 
+        public void Stop()
+        {
+            cancelled = true;
+            thread.Join();
+        }
+
         protected virtual void OnResultReady(WorkerResult result)
         {
             if (ResultReady != null)
@@ -46,7 +53,7 @@ namespace RealStereo
 
         private void Run()
         {
-            while (true)
+            while (!cancelled)
             {
                 DoWork();
 
@@ -56,53 +63,35 @@ namespace RealStereo
 
         private void DoWork()
         {
-            Stopwatch stopwatch = new Stopwatch();
-            stopwatch.Start();
             WorkerResult result = new WorkerResult(cameras.Keys.Count);
             Point coordinates = new Point(0, 0);
             bool applyCoordinates = true;
 
-            CountdownEvent activeThreads = new CountdownEvent(cameras.Keys.Count);
-
             for (int i = 0; i < cameras.Keys.Count; i++)
             {
-                ThreadPool.QueueUserWorkItem((object state) =>
+                Image image = cameras.Keys.ElementAt(i);
+                Camera camera = cameras[image];
+
+                camera.Process(isBalancing);
+                result.SetFrame(i, camera.GetFrame());
+                Point? cameraCoordinates = camera.GetCoordinates(i % 2 == 0 ? Orientation.Horizontal : Orientation.Vertical);
+
+                // if a camera is not ready or didn't detect a person, cancel coordinates calculation
+                if (cameraCoordinates == null)
                 {
-                    object[] args = state as object[];
-                    Dictionary<Image, Camera> cameras = args[0] as Dictionary<Image, Camera>;
-                    int index = (int) args[1];
-
-                    Image image = cameras.Keys.ElementAt(index);
-                    Camera camera = cameras[image];
-
-                    camera.Process(isBalancing);
-                    result.SetFrame(index, camera.GetFrame());
-                    Point? cameraCoordinates = camera.GetCoordinates(i % 2 == 0 ? Orientation.Horizontal : Orientation.Vertical);
-
-                    // if a camera is not ready or didn't detect a person, cancel coordinates calculation
-                    if (cameraCoordinates == null)
-                    {
-                        applyCoordinates = false;
-                    }
-                    else
-                    {
-                        coordinates.X = Math.Max(coordinates.X, cameraCoordinates.Value.X);
-                        coordinates.Y = Math.Max(coordinates.Y, cameraCoordinates.Value.Y);
-                    }
-
-                    activeThreads.Signal();
-                }, new object[] { cameras, i });
+                    applyCoordinates = false;
+                }
+                else
+                {
+                    coordinates.X = Math.Max(coordinates.X, cameraCoordinates.Value.X);
+                    coordinates.Y = Math.Max(coordinates.Y, cameraCoordinates.Value.Y);
+                }
             }
-
-            activeThreads.Wait();
 
             if (applyCoordinates)
             {
                 result.SetCoordinates(coordinates);
             }
-
-            stopwatch.Stop();
-            //System.Diagnostics.Debug.WriteLine(stopwatch.ElapsedMilliseconds);
 
             if (Application.Current != null)
             {

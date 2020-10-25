@@ -20,7 +20,10 @@ namespace RealStereo
 
         public void SetFrame(int camera, BitmapImage frame)
         {
-            frames[camera] = frame;
+            if (camera < frames.Length)
+            {
+                frames[camera] = frame;
+            }
         }
 
         public Point GetCoordinates()

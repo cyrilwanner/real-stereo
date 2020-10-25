@@ -1,7 +1,6 @@
 ﻿using Emgu.CV;
 using Emgu.CV.Structure;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
@@ -40,11 +39,7 @@ namespace RealStereo
             }
 
             // detect people
-            Stopwatch stopwatch = new Stopwatch();
-            stopwatch.Start();
             MCvObjectDetection[] regions = peopleDetector.Detect(frame);
-            stopwatch.Stop();
-            System.Diagnostics.Debug.WriteLine("Detect: " + stopwatch.ElapsedMilliseconds);
 
             // if no people got detected, assume they haven't moved and use the previous regions
             if (regions.Length == 0)
