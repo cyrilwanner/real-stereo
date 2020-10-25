@@ -20,7 +20,7 @@ namespace RealStereo
 
         public Camera(int cameraIndex, PeopleDetector peopleDetector)
         {
-            this.capture = new VideoCapture(cameraIndex);
+            this.capture = new VideoCapture(cameraIndex, VideoCapture.API.Msmf);
             this.peopleDetector = peopleDetector;
         }
 

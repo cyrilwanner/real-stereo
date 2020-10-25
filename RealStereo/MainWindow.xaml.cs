@@ -1,4 +1,4 @@
-using AForge.Video.DirectShow;
+using MediaFoundation;
 using NAudio.CoreAudioApi;
 using System;
 using System.Collections.Generic;
@@ -20,7 +20,6 @@ namespace RealStereo
         private Dictionary<Image, Camera> cameras = new Dictionary<Image, Camera>();
         private DispatcherTimer timer;
         private PeopleDetector peopleDetector;
-        private FilterInfoCollection videoDevices;
         private Dictionary<string, int> videoDeviceNameIndexDictionary = new Dictionary<string, int>();
         private bool isBalancing = false;
 
@@ -31,29 +30,7 @@ namespace RealStereo
             // create HOG descriptor
             peopleDetector = new PeopleDetector();
 
-            Loaded += new RoutedEventHandler(LoadCameras);
             Loaded += new RoutedEventHandler(StartCameras);
-        }
-
-        private void LoadCameras(object sender, RoutedEventArgs e)
-        {
-            videoDevices = new FilterInfoCollection(FilterCategory.VideoInputDevice);
-            for (int i = 0; i < videoDevices.Count; i++)
-            {
-                String deviceName = videoDevices[i].Name;
-                String initialDeviceName = deviceName;
-                int deviceNumber = 1;
-
-                while (videoDeviceNameIndexDictionary.ContainsKey(deviceName))
-                {
-                    deviceNumber++;
-                    deviceName = initialDeviceName + " " + deviceNumber;
-                }
-
-                videoDeviceNameIndexDictionary.Add(deviceName, i);
-                camera1ComboBox.Items.Add(new string(deviceName));
-                camera2ComboBox.Items.Add(new string(deviceName));
-            }
         }
 
         private void ToggleBalancing(object sender, RoutedEventArgs e)
@@ -166,9 +143,51 @@ namespace RealStereo
             }
         }
 
+        private void cameraComboBox_DropDownOpened(object sender, EventArgs e)
+        {
+            ComboBox comboBox = sender as ComboBox;
+
+            videoDeviceNameIndexDictionary.Clear();
+            object selectedItem = comboBox.SelectedItem;
+            comboBox.Items.Clear();
+            comboBox.Items.Add("None");
+
+            IMFActivate[] devices;
+            HResult hr = MF.EnumVideoDeviceSources(out devices);
+            hr.ThrowExceptionOnError();
+            for (int i = 0; i < devices.Length; i++)
+            {
+                string friendlyName;
+                hr = devices[i].GetAllocatedString(MFAttributesClsid.MF_DEVSOURCE_ATTRIBUTE_FRIENDLY_NAME, out friendlyName);
+                hr.ThrowExceptionOnError();
+
+                int deviceNumber = 1;
+                while (videoDeviceNameIndexDictionary.ContainsKey(friendlyName))
+                {
+                    deviceNumber++;
+                    friendlyName = friendlyName + " " + deviceNumber;
+                }
+
+                videoDeviceNameIndexDictionary.Add(friendlyName, i);
+                comboBox.Items.Add(friendlyName);
+                if (selectedItem.ToString() == friendlyName)
+                {
+                    comboBox.SelectedItem = friendlyName;
+                }
+            }
+            if (comboBox.SelectedItem == null)
+            {
+                comboBox.SelectedIndex = 0;
+            }
+        }
+
         private void cameraComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             ComboBox comboBox = sender as ComboBox;
+            if (comboBox.SelectedItem == null)
+            {
+                return;
+            }
             ComboBox otherComboBox = comboBox == camera1ComboBox ? camera2ComboBox : camera1ComboBox;
             Image camera = comboBox == camera1ComboBox ? camera1 : camera2;
             Image otherCamera = comboBox == camera1ComboBox ? camera2 : camera1;
@@ -192,9 +211,9 @@ namespace RealStereo
 
         private void audioDeviceComboBox_DropDownOpened(object sender, EventArgs e)
         {
+            ComboBox comboBox = (ComboBox)sender;
             MMDeviceEnumerator audioDeviceEnumerator = new MMDeviceEnumerator();
             MMDeviceCollection audioDeviceCollection;
-            ComboBox comboBox = (ComboBox)sender;
 
             if (comboBox == audioOutputComboBox)
             {
@@ -224,7 +243,11 @@ namespace RealStereo
         private void audioDeviceComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             ComboBox comboBox = (ComboBox)sender;
-            MMDevice audioDevice = e.AddedItems.Count > 0 && e.AddedItems[0] is MMDevice ? (MMDevice)e.AddedItems[0] : null;
+            if (comboBox.SelectedItem == null)
+            {
+                return;
+            }
+            MMDevice audioDevice = comboBox.SelectedItem is MMDevice ? (MMDevice)comboBox.SelectedItem : null;
 
             if (comboBox == audioOutputComboBox)
             {
