@@ -155,6 +155,13 @@ namespace RealStereo
                 hr = devices[i].GetAllocatedString(MFAttributesClsid.MF_DEVSOURCE_ATTRIBUTE_FRIENDLY_NAME, out friendlyName);
                 hr.ThrowExceptionOnError();
 
+                int deviceNumber = 1;
+                while (videoDeviceNameIndexDictionary.ContainsKey(friendlyName))
+                {
+                    deviceNumber++;
+                    friendlyName = friendlyName + " " + deviceNumber;
+                }
+
                 videoDeviceNameIndexDictionary.Add(friendlyName, i);
                 comboBox.Items.Add(friendlyName);
                 if (selectedItem.ToString() == friendlyName)
