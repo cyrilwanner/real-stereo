@@ -1,5 +1,7 @@
 using MediaFoundation;
 using NAudio.CoreAudioApi;
+using NAudio.Wave;
+using NAudio.Wave.SampleProviders;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -248,10 +250,24 @@ namespace RealStereo
                 return;
             }
             MMDevice audioDevice = comboBox.SelectedItem is MMDevice ? (MMDevice)comboBox.SelectedItem : null;
+            if (audioDevice == null)
+            {
+                return;
+            }
 
             if (comboBox == audioOutputComboBox)
             {
                 UpdateChannelLevelList();
+                // Play sound on all channels, then mute the first one
+                TestTone.play(audioDevice, 1, new EventHandler<StoppedEventArgs>(delegate (object o, StoppedEventArgs e)
+                {
+                    audioDevice.AudioEndpointVolume.Channels[0].VolumeLevelScalar = 0;
+                    TestTone.play(audioDevice, 3, new EventHandler<StoppedEventArgs>(delegate (object o, StoppedEventArgs e)
+                    {
+                        // Restore the volume levels to the same
+                        audioDevice.AudioEndpointVolume.Channels[0].VolumeLevelScalar = audioDevice.AudioEndpointVolume.Channels[1].VolumeLevelScalar;
+                    }));
+                }));
             }
             else
             {
