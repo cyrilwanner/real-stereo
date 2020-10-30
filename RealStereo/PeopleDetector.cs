@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace RealStereo
 {
-    class PeopleDetector
+    public class PeopleDetector
     {
         private HOGDescriptor hogDescriptor;
         private static int GROUP_THRESHOLD = 50;

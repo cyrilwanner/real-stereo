@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Windows;
@@ -10,7 +9,7 @@ using Point = System.Drawing.Point;
 
 namespace RealStereo
 {
-    class WorkerThread
+    public class WorkerThread
     {
         private Thread thread;
         private Dictionary<Image, Camera> cameras;
@@ -32,6 +31,16 @@ namespace RealStereo
         public void SetBalancing(bool isBalancing)
         {
             this.isBalancing = isBalancing;
+        }
+
+        public bool IsBalancing()
+        {
+            return isBalancing;
+        }
+
+        public ref Dictionary<Image, Camera> GetCameras()
+        {
+            return ref cameras;
         }
 
         public void Stop()
