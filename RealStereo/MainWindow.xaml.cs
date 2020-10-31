@@ -244,6 +244,7 @@ namespace RealStereo
             window.Left = Left + Width;
             window.Top = Top;
             window.Height = Height;
+            window.InitConfiguration(ref workerThread);
             window.ShowDialog();
         }
 
