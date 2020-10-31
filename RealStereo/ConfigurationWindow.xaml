@@ -13,6 +13,8 @@
                 <TextBox x:Name="roomNameTextBox" />
 
                 <TextBlock TextWrapping="Wrap" Margin="0,10,0,0">
+                    <Run Text="Place the two cameras in a ~90° angle to each other." />
+                    <LineBreak />
                     <Run Text="Make sure that it is as quiet as possible inside the room." />
                     <LineBreak />
                     <Run Text="After starting the calibration, move yourself with the microphone to the specified position." />
@@ -21,16 +23,21 @@
                     <LineBreak />
                     <Run Text="When the four corner positions are set up, you can add as many additional positions between those corner positions as you like." />
                     <LineBreak />
-                    <Run Text="When all positions are calibrated, exit the configuration by pressing the save button" />
+                    <Run Text="When all positions are calibrated, exit the configuration by pressing the save button." />
                 </TextBlock>
-                <Button x:Name="startCalibrationButton" Content="Start calibration" Margin="0,10,0,0" IsEnabled="False" />
+                <Button x:Name="startCalibrationButton" Content="Start calibration" Margin="0,10,0,0" IsEnabled="False" Click="StartConfiguration" />
 
-                <Label Content="Calibration progress" Margin="0,10,0,0" />
-                <CheckBox Content="Corner Top Left" IsEnabled="False" />
-                <CheckBox Content="Corner Top Right" IsEnabled="False" />
-                <CheckBox Content="Corner Bottom Left" IsEnabled="False" />
-                <CheckBox Content="Corner Bottom Right" IsEnabled="False" />
-                <CheckBox Content="Middle" IsEnabled="False" />
+                <Border x:Name="instructionsBox" Visibility="Collapsed" BorderBrush="Green" BorderThickness="2" Margin="0,10,0,0">
+                    <TextBlock x:Name="instructionsText" TextWrapping="Wrap" Margin="10" TextAlignment="Center" FontSize="20" />
+                </Border>
+
+                <StackPanel x:Name="positions" Visibility="Collapsed">
+                    <Label Content="Calibration progress" Margin="0,10,0,0" />
+                    <CheckBox Content="Corner 1" IsEnabled="False" />
+                    <CheckBox Content="Corner 2" IsEnabled="False" />
+                    <CheckBox Content="Corner 3" IsEnabled="False" />
+                    <CheckBox Content="Corner 4" IsEnabled="False" />
+                </StackPanel>
             </StackPanel>
             <StackPanel DockPanel.Dock="Bottom" Margin="0,10,10,10" Orientation="Horizontal" VerticalAlignment="Bottom" HorizontalAlignment="Right">
                 <Button x:Name="cancelButton" Content="Cancel" Padding="10,0,10,0" Click="CancelConfiguration" />

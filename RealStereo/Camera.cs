@@ -10,7 +10,7 @@ using Inter = Emgu.CV.CvEnum.Inter;
 
 namespace RealStereo
 {
-    class Camera
+    public class Camera
     {
         private VideoCapture capture;
         private PeopleDetector peopleDetector;
