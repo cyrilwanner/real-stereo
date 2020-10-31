@@ -8,26 +8,49 @@ using System.Text;
 namespace RealStereo
 {
     class TestTone
-    { 
-        public static void play(MMDevice audioDevice, int seconds, EventHandler<StoppedEventArgs> PlaybackStopped = null)
+    {
+        private SignalGenerator sineSignalGenerator;
+        private MMDevice outputAudioDevice;
+        private IWavePlayer outWavePlayer;
+
+        public TestTone(MMDevice outputAudioDevice)
         {
-            ISampleProvider sine = new SignalGenerator()
+            sineSignalGenerator = new SignalGenerator()
             {
-                Gain = 0.1,
+                Gain = 1,
                 Frequency = 2000,
                 Type = SignalGeneratorType.Sin
-            }.Take(TimeSpan.FromSeconds(seconds));
-            IWavePlayer waveOut = new WasapiOut(audioDevice, AudioClientShareMode.Shared, false, 50);
-            waveOut.Init(sine);
-            waveOut.Play();
-            waveOut.PlaybackStopped += new EventHandler<StoppedEventArgs>(delegate (object o, StoppedEventArgs e)
+            };
+            this.outputAudioDevice = outputAudioDevice;
+        }
+
+        public void Play(int seconds, EventHandler<StoppedEventArgs> PlaybackStopped = null)
+        {
+            if (outputAudioDevice == null || sineSignalGenerator == null)
             {
-                waveOut.Dispose();
+                return;
+            }
+
+            outWavePlayer = new WasapiOut(outputAudioDevice, AudioClientShareMode.Shared, false, 250); // High latency (big buffer) of 250, since our camera detection uses so much CPU
+            outWavePlayer.PlaybackStopped += new EventHandler<StoppedEventArgs>(delegate (object o, StoppedEventArgs e)
+            {
+                outWavePlayer.Dispose();
             });
             if (PlaybackStopped != null)
             {
-                waveOut.PlaybackStopped += PlaybackStopped;
+                outWavePlayer.PlaybackStopped += PlaybackStopped;
             }
+            outWavePlayer.Init(sineSignalGenerator.Take(TimeSpan.FromSeconds(seconds)));
+            outWavePlayer.Play();
+        }
+
+        public void Stop()
+        {
+            if (outWavePlayer == null)
+            {
+                return;
+            }
+            outWavePlayer.Stop();
         }
     }
 }
