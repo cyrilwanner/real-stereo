@@ -14,6 +14,8 @@ namespace RealStereo
         private TestTone testTone;
         private int speakerStep;
         private Dictionary<int, float> originalChannelVolume = new Dictionary<int, float>();
+        Dictionary<int, float[]> volumes = new Dictionary<int, float[]>();
+        private bool isCanceled;
 
         public ConfigurationStepSpeaker(ConfigurationManager manager, ref WorkerThread workerThread)
         {
@@ -24,6 +26,8 @@ namespace RealStereo
         public void Start()
         {
             MMDevice outputAudioDevice = workerThread.GetOutputAudioDevice();
+            MMDevice inputAudioDevice = workerThread.GetInputAudioDevice();
+            isCanceled = false;
             originalChannelVolume.Clear();
             speakerStep = 1;
             for (int i = 0; i < outputAudioDevice.AudioEndpointVolume.Channels.Count; i++)
@@ -32,7 +36,7 @@ namespace RealStereo
             }
             MuteAllChannels();
 
-            testTone = new TestTone(outputAudioDevice);
+            testTone = new TestTone(outputAudioDevice, inputAudioDevice);
             manager.SetInstructions("Calibrating speakers channel " + (int) (speakerStep / 2) + " - Step 1");
             outputAudioDevice.AudioEndpointVolume.Channels[0].VolumeLevelScalar = originalChannelVolume[0];
             testTone.Play(2, new EventHandler<StoppedEventArgs>(TestToneStopped));
@@ -45,6 +49,7 @@ namespace RealStereo
             {
                 return;
             }
+            isCanceled = true;
             testTone.Stop();
             foreach(int i in originalChannelVolume.Keys)
             {
@@ -59,11 +64,17 @@ namespace RealStereo
             {
                 outputAudioDevice.AudioEndpointVolume.Channels[i].VolumeLevelScalar = originalChannelVolume[i];
             }
+
+            currentConfiguration.Volumes = volumes;
             return currentConfiguration;
         }
 
         private void TestToneStopped(object sender, StoppedEventArgs e)
         {
+            if (isCanceled)
+            {
+                return;
+            }
             MMDevice outputAudioDevice = workerThread.GetOutputAudioDevice();
             if (speakerStep >= outputAudioDevice.AudioEndpointVolume.Channels.Count * 2)
             {
@@ -73,6 +84,12 @@ namespace RealStereo
 
             MuteAllChannels();
             int channelIndex = speakerStep / 2;
+            if (!volumes.ContainsKey(channelIndex))
+            {
+                volumes[channelIndex] = new float[2];
+            }
+            volumes[(speakerStep-1) / 2][(speakerStep-1) % 2] = testTone.GetAverageCaptureVolume();
+
             AudioEndpointVolumeChannel audioEndpointVolume = outputAudioDevice.AudioEndpointVolume.Channels[channelIndex];
             if (speakerStep % 2 == 0)
             {
