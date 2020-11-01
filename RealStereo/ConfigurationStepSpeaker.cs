@@ -84,11 +84,11 @@ namespace RealStereo
 
             MuteAllChannels();
             int channelIndex = speakerStep / 2;
-            if (!volumes.ContainsKey(channelIndex))
+            if (!volumes.ContainsKey((int)(speakerStep - 1) / 2))
             {
-                volumes[channelIndex] = new float[2];
+                volumes[(int)(speakerStep - 1) / 2] = new float[2];
             }
-            volumes[(speakerStep-1) / 2][(speakerStep-1) % 2] = testTone.GetAverageCaptureVolume();
+            volumes[(int) (speakerStep-1) / 2][(speakerStep-1) % 2] = testTone.GetAverageCaptureVolume();
 
             AudioEndpointVolumeChannel audioEndpointVolume = outputAudioDevice.AudioEndpointVolume.Channels[channelIndex];
             if (speakerStep % 2 == 0)

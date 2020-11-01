@@ -31,10 +31,6 @@ namespace RealStereo
         {
             captureSamples.Clear();
             wasapiCapture = new WasapiCapture(inputAudioDevice);
-            wasapiCapture.RecordingStopped += new EventHandler<StoppedEventArgs>(delegate (object o, StoppedEventArgs e)
-            {
-                wasapiCapture.Dispose();
-            });
             wasapiCapture.DataAvailable += new EventHandler<WaveInEventArgs>(delegate (object o, WaveInEventArgs e)
             {
                 int increaseBy = (wasapiCapture.WaveFormat.BitsPerSample / 8) * wasapiCapture.WaveFormat.Channels;
@@ -67,7 +63,7 @@ namespace RealStereo
             outWavePlayer = new WasapiOut(outputAudioDevice, AudioClientShareMode.Shared, false, 250); // High latency (big buffer) of 250, since our camera detection uses so much CPU
             outWavePlayer.PlaybackStopped += new EventHandler<StoppedEventArgs>(delegate (object o, StoppedEventArgs e)
             {
-                wasapiCapture.StopRecording();
+                wasapiCapture.Dispose();
                 outWavePlayer.Dispose();
             });
             if (PlaybackStopped != null)
