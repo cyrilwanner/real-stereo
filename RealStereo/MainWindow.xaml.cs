@@ -1,5 +1,7 @@
 using MediaFoundation;
 using NAudio.CoreAudioApi;
+using NAudio.Wave;
+using NAudio.Wave.SampleProviders;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -226,14 +228,19 @@ namespace RealStereo
                 return;
             }
             MMDevice audioDevice = comboBox.SelectedItem is MMDevice ? (MMDevice)comboBox.SelectedItem : null;
+            if (audioDevice == null)
+            {
+                return;
+            }
 
             if (comboBox == audioOutputComboBox)
             {
                 UpdateChannelLevelList();
+                workerThread.SetOutputAudioDevice(audioDevice);
             }
             else
             {
-                // Input device
+                workerThread.SetInputAudioDevice(audioDevice);
             }
         }
 

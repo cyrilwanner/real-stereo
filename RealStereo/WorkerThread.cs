@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NAudio.CoreAudioApi;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -15,6 +16,8 @@ namespace RealStereo
         private Dictionary<Image, Camera> cameras;
         private bool isBalancing = false;
         private bool cancelled = false;
+        private MMDevice outputAudioDevice;
+        private MMDevice inputAudioDevice;
 
         private static int FPS = 10;
 
@@ -31,6 +34,26 @@ namespace RealStereo
         public void SetBalancing(bool isBalancing)
         {
             this.isBalancing = isBalancing;
+        }
+
+        public void SetOutputAudioDevice(MMDevice outputAudioDevice)
+        {
+            this.outputAudioDevice = outputAudioDevice;
+        }
+
+        public MMDevice GetOutputAudioDevice()
+        {
+            return outputAudioDevice;
+        }
+
+        public void SetInputAudioDevice(MMDevice inputAudioDevice)
+        {
+            this.inputAudioDevice = inputAudioDevice;
+        }
+
+        public MMDevice GetInputAudioDevice()
+        {
+            return inputAudioDevice;
         }
 
         public bool IsBalancing()

@@ -17,7 +17,7 @@ namespace RealStereo
         {
             steps = new ConfigurationStep[] {
                 new ConfigurationStepCamera(this, ref workerThread),
-                new ConfigurationStepSpeaker(this),
+                new ConfigurationStepSpeaker(this, ref workerThread),
             };
 
             this.instructionsText = instructionsText;
