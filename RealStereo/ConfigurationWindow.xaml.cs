@@ -25,7 +25,7 @@ namespace RealStereo
             }
         }
 
-        private void CancelConfiguration(object sender, RoutedEventArgs e)
+        private void CancelConfiguration(object sender, object e)
         {
             manager.Cancel();
             Close();
@@ -38,6 +38,14 @@ namespace RealStereo
             instructionsBox.Visibility = Visibility.Visible;
             audioInputDeviceVolume.Visibility = Visibility.Visible;
             manager.Start();
+        }
+
+        private void OnClosing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            if (manager != null)
+            {
+                manager.Cancel();
+            }
         }
     }
 }
