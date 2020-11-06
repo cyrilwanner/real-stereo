@@ -16,7 +16,7 @@ namespace RealStereo
         private long lastMove = 0;
         private List<Point> coordinates = new List<Point>();
 
-        private static int MOVE_THRESHOLD = 30;
+        private static int MOVE_THRESHOLD = 40;
         private static int STAND_STILL_TIME = 3;
 
         public ConfigurationStepCamera(ConfigurationManager manager, ref WorkerThread workerThread)
@@ -63,9 +63,10 @@ namespace RealStereo
 
         private void ResultReady(object sender, ResultReadyEventArgs e)
         {
-            if (e.Result.GetCoordinates() != null)
+            if (e.Result.GetCoordinates().HasValue)
             {
-                if (DidMove(e.Result.GetCoordinates()))
+                Point currentCoordinates = e.Result.GetCoordinates().Value;
+                if (DidMove(currentCoordinates))
                 {
                     if (lastMove > 0)
                     {
@@ -99,11 +100,11 @@ namespace RealStereo
                     }
                     else if (isActiveStep)
                     {
-                        coordinates.Add(e.Result.GetCoordinates());
+                        coordinates.Add(currentCoordinates);
                     }
                 }
 
-                lastCoordinates = e.Result.GetCoordinates();
+                lastCoordinates = currentCoordinates;
             }
         }
 
