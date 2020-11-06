@@ -12,8 +12,9 @@ namespace RealStereo
         private Configuration currentConfiguration = new Configuration();
         private TextBlock instructionsText;
         private Border instructionsBox;
+        private ProgressBar audioInputDeviceVolume;
 
-        public ConfigurationManager(ref WorkerThread workerThread, TextBlock instructionsText, Border instructionsBox)
+        public ConfigurationManager(ref WorkerThread workerThread, TextBlock instructionsText, Border instructionsBox, ProgressBar audioInputDeviceVolume)
         {
             steps = new ConfigurationStep[] {
                 new ConfigurationStepCamera(this, ref workerThread),
@@ -22,6 +23,7 @@ namespace RealStereo
 
             this.instructionsText = instructionsText;
             this.instructionsBox = instructionsBox;
+            this.audioInputDeviceVolume = audioInputDeviceVolume;
         }
 
         public void Start()
@@ -72,6 +74,11 @@ namespace RealStereo
         {
             instructionsBox.BorderBrush = Brushes.Red;
             instructionsText.Text = text;
+        }
+
+        public void SetAudioInputDeviceVolume(float value)
+        {
+            audioInputDeviceVolume.Value = value;
         }
     }
 }
