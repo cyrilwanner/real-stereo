@@ -16,7 +16,7 @@ namespace RealStereo
 
         public void InitConfiguration(ref WorkerThread workerThread)
         {
-            manager = new ConfigurationManager(ref workerThread, instructionsText, instructionsBox, audioInputDeviceVolume);
+            manager = new ConfigurationManager(ref workerThread, instructionsText, instructionsBox, audioInputDeviceVolume, positions);
 
             // if all devices are set, enable the start button
             if (workerThread.GetCameras().Keys.Count >= 2 && workerThread.GetOutputAudioDevice() != null && workerThread.GetInputAudioDevice() != null)
