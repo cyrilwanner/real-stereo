@@ -50,12 +50,12 @@
                 <DockPanel>
                     <StackPanel DockPanel.Dock="Top">
                         <Label x:Name="roomConfigLabel" Content="Select room configuration"/>
-                        <ComboBox x:Name="roomComboBox" SelectedIndex="0">
-                            <System:String>Default</System:String>
+                        <ComboBox x:Name="roomComboBox" SelectedIndex="0" DropDownOpened="roomComboBox_DropDownOpened" SelectionChanged="roomComboBox_SelectionChanged">
+                            <System:String>None</System:String>
                         </ComboBox>
-                        <Button x:Name="editConfigButton" Content="Edit configuration" Margin="0,10,0,0" Click="EditConfiguration" />
+                        <Button x:Name="editConfigButton" Content="New configuration" Margin="0,10,0,0" Click="EditConfiguration" />
                     </StackPanel>
-                    <Button DockPanel.Dock="Bottom" x:Name="startBalancingButton" Content="Start Balancing" VerticalAlignment="Bottom" FontWeight="Bold" Click="ToggleBalancing" />
+                    <Button DockPanel.Dock="Bottom" x:Name="startBalancingButton" Content="Start Balancing" VerticalAlignment="Bottom" FontWeight="Bold" Click="ToggleBalancing" IsEnabled="False" />
                 </DockPanel>
             </Border>
 

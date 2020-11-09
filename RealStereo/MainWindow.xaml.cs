@@ -244,6 +244,51 @@ namespace RealStereo
             }
         }
 
+        private void roomComboBox_DropDownOpened(object sender, EventArgs e)
+        {
+            ComboBox comboBox = sender as ComboBox;
+
+            object selectedItem = comboBox.SelectedItem;
+            comboBox.Items.Clear();
+            comboBox.Items.Add("None");
+            comboBox.SelectedIndex = 0;
+
+            foreach (string roomName in Configuration.GetInstance().Rooms.Keys)
+            {
+                comboBox.Items.Add(roomName);
+
+                if (roomName == selectedItem.ToString())
+                {
+                    comboBox.SelectedItem = roomName;
+                }
+            }
+
+            if (selectedItem == null)
+            {
+                comboBox.SelectedIndex = 0;
+            }
+        }
+
+        private void roomComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (startBalancingButton == null)
+            {
+                return;
+            }
+
+            ComboBox comboBox = sender as ComboBox;
+            if (comboBox.SelectedItem == null || comboBox.SelectedItem.ToString() == "None")
+            {
+                startBalancingButton.IsEnabled = false;
+            }
+            else
+            {
+                startBalancingButton.IsEnabled = true;
+                Configuration.GetInstance().SelectedRoom = comboBox.SelectedItem.ToString();
+                Configuration.GetInstance().Save();
+            }
+        }
+
         private void EditConfiguration(object sender, RoutedEventArgs e)
         {
             ConfigurationWindow window = new ConfigurationWindow();
