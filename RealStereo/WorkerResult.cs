@@ -5,7 +5,7 @@ namespace RealStereo
 {
     public class WorkerResult
     {
-        private Point coordinates;
+        private Point? coordinates = null;
         private BitmapImage[] frames;
 
         public WorkerResult(int numCameras)
@@ -26,7 +26,7 @@ namespace RealStereo
             }
         }
 
-        public Point GetCoordinates()
+        public Point? GetCoordinates()
         {
             return coordinates;
         }

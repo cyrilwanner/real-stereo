@@ -37,9 +37,9 @@ namespace RealStereo
 
         private void ResultReady(object sender, ResultReadyEventArgs e)
         {
-            if (e.Result.GetCoordinates() != null)
+            if (e.Result.GetCoordinates().HasValue)
             {
-                coordinatesTextBlock.Text = "Point(" + e.Result.GetCoordinates().X + ", " + e.Result.GetCoordinates().Y + ")";
+                coordinatesTextBlock.Text = "Point(" + e.Result.GetCoordinates().Value.X + ", " + e.Result.GetCoordinates().Value.Y + ")";
             }
 
             if (e.Result.GetFrames() != null)

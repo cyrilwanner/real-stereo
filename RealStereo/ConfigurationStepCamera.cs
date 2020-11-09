@@ -11,12 +11,13 @@ namespace RealStereo
         private ConfigurationManager manager;
         private WorkerThread workerThread;
         private bool initialBalancingValue;
+        private bool initialized = false;
         private bool isActiveStep = false;
-        private Point lastCoordinates;
+        private Point? lastCoordinates;
         private long lastMove = 0;
         private List<Point> coordinates = new List<Point>();
 
-        private static int MOVE_THRESHOLD = 30;
+        private static int MOVE_THRESHOLD = 40;
         private static int STAND_STILL_TIME = 3;
 
         public ConfigurationStepCamera(ConfigurationManager manager, ref WorkerThread workerThread)
@@ -27,16 +28,34 @@ namespace RealStereo
 
         public void Start()
         {
-            workerThread.ResultReady += ResultReady;
-            initialBalancingValue = workerThread.IsBalancing();
-            
-            if (!initialBalancingValue)
+            if (initialized)
             {
-                workerThread.SetBalancing(true);
+                // reset state before the next position
+                Cancel();
+            }
+            else
+            {
+                initialized = true;
             }
 
             manager.SetInstructions("Go to the position and stand still");
             isActiveStep = true;
+            lastMove = 0;
+            lastCoordinates = null;
+
+            Task.Delay(3000).ContinueWith(_ =>
+            {
+                System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                {
+                    workerThread.ResultReady += ResultReady;
+                    initialBalancingValue = workerThread.IsBalancing();
+
+                    if (!initialBalancingValue)
+                    {
+                        workerThread.SetBalancing(true);
+                    }
+                });
+            });
         }
 
         public void Cancel()
@@ -63,9 +82,10 @@ namespace RealStereo
 
         private void ResultReady(object sender, ResultReadyEventArgs e)
         {
-            if (e.Result.GetCoordinates() != null)
+            if (e.Result.GetCoordinates().HasValue)
             {
-                if (DidMove(e.Result.GetCoordinates()))
+                Point currentCoordinates = e.Result.GetCoordinates().Value;
+                if (DidMove(currentCoordinates))
                 {
                     if (lastMove > 0)
                     {
@@ -99,27 +119,27 @@ namespace RealStereo
                     }
                     else if (isActiveStep)
                     {
-                        coordinates.Add(e.Result.GetCoordinates());
+                        coordinates.Add(currentCoordinates);
                     }
                 }
 
-                lastCoordinates = e.Result.GetCoordinates();
+                lastCoordinates = currentCoordinates;
             }
         }
 
         private bool DidMove(Point coordinates)
         {
-            if (lastCoordinates == null)
+            if (!lastCoordinates.HasValue)
             {
                 return true;
             }
 
-            if (coordinates.X >= lastCoordinates.X + MOVE_THRESHOLD || coordinates.X <= lastCoordinates.X - MOVE_THRESHOLD)
+            if (coordinates.X >= lastCoordinates.Value.X + MOVE_THRESHOLD || coordinates.X <= lastCoordinates.Value.X - MOVE_THRESHOLD)
             {
                 return true;
             }
 
-            if (coordinates.Y >= lastCoordinates.Y + MOVE_THRESHOLD || coordinates.Y <= lastCoordinates.Y - MOVE_THRESHOLD)
+            if (coordinates.Y >= lastCoordinates.Value.Y + MOVE_THRESHOLD || coordinates.Y <= lastCoordinates.Value.Y - MOVE_THRESHOLD)
             {
                 return true;
             }

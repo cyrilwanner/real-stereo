@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Controls;
 using System.Windows.Media;
 
@@ -13,8 +14,9 @@ namespace RealStereo
         private TextBlock instructionsText;
         private Border instructionsBox;
         private ProgressBar audioInputDeviceVolume;
+        private StackPanel positions;
 
-        public ConfigurationManager(ref WorkerThread workerThread, TextBlock instructionsText, Border instructionsBox, ProgressBar audioInputDeviceVolume)
+        public ConfigurationManager(ref WorkerThread workerThread, TextBlock instructionsText, Border instructionsBox, ProgressBar audioInputDeviceVolume, StackPanel positions)
         {
             steps = new ConfigurationStep[] {
                 new ConfigurationStepCamera(this, ref workerThread),
@@ -24,6 +26,7 @@ namespace RealStereo
             this.instructionsText = instructionsText;
             this.instructionsBox = instructionsBox;
             this.audioInputDeviceVolume = audioInputDeviceVolume;
+            this.positions = positions;
         }
 
         public void Start()
@@ -42,16 +45,31 @@ namespace RealStereo
             }
             else
             {
-                configurations.Add(currentConfiguration);
                 NextPosition();
             }
         }
 
         private void NextPosition()
         {
+            // update UI
+            List<CheckBox> checkboxes = positions.Children.OfType<CheckBox>().ToList();
+            checkboxes[configurations.Count].IsChecked = true;
+
+            // start next position
+            configurations.Add(currentConfiguration);
             currentStep = 0;
             currentConfiguration = new Configuration();
             Start();
+
+            // add new UI checkbox if needed
+            if (checkboxes.Count == configurations.Count)
+            {
+                CheckBox checkbox = new CheckBox();
+                checkbox.IsChecked = false;
+                checkbox.IsEnabled = false;
+                checkbox.Content = "Middle " + (checkboxes.Count - 3);
+                positions.Children.Add(checkbox);
+            }
         }
 
         public void Cancel()

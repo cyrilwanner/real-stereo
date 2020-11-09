@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:RealStereo"
         mc:Ignorable="d"
-        Title="Configuration" Height="475" Width="400">
+        Title="Configuration" Height="475" Width="400" Closing="OnClosing">
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <DockPanel>
             <StackPanel DockPanel.Dock="Top" Margin="10,10,10,10">
