@@ -1,4 +1,5 @@
 ﻿using NAudio.CoreAudioApi;
+using NAudio.Dsp;
 using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
 using System;
@@ -33,11 +34,15 @@ namespace RealStereo
         {
             captureSamples.Clear();
             wasapiCapture = new WasapiCapture(inputAudioDevice);
+            BiQuadFilter lowPassFilter = BiQuadFilter.LowPassFilter(wasapiCapture.WaveFormat.SampleRate, 1900, 1);
+            BiQuadFilter highPassFilter = BiQuadFilter.HighPassFilter(wasapiCapture.WaveFormat.SampleRate, 2100, 1);
             wasapiCapture.DataAvailable += new EventHandler<WaveInEventArgs>(delegate (object o, WaveInEventArgs e)
             {
                 for (int i = 0; i < e.BytesRecorded; i += 4)
                 {
                     float sample = BitConverter.ToSingle(e.Buffer, i);
+                    sample = lowPassFilter.Transform(sample);
+                    sample = highPassFilter.Transform(sample);
                     captureSamples.Add(sample);
                 }
             });
