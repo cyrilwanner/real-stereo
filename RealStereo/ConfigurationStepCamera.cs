@@ -65,7 +65,7 @@ namespace RealStereo
             isActiveStep = false;
         }
 
-        public Configuration Finish(Configuration currentConfiguration)
+        public PointConfiguration Finish(PointConfiguration currentConfiguration)
         {
             int x = 0;
             int y = 0;

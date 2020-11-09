@@ -1,7 +1,5 @@
 using MediaFoundation;
 using NAudio.CoreAudioApi;
-using NAudio.Wave;
-using NAudio.Wave.SampleProviders;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,12 +25,26 @@ namespace RealStereo
             InitializeComponent();
 
             Loaded += new RoutedEventHandler(StartWorkerThread);
+            Loaded += new RoutedEventHandler(InitializeSelectedConfiguration);
         }
 
         private void StartWorkerThread(object sender, RoutedEventArgs e)
         {
             workerThread = new WorkerThread(ref cameras);
             workerThread.ResultReady += ResultReady;
+        }
+
+        private void InitializeSelectedConfiguration(object sender, RoutedEventArgs e)
+        {
+            string selectedRoom = Configuration.GetInstance().SelectedRoom;
+
+            if (selectedRoom != null)
+            {
+                // trigger dropdown population
+                roomComboBox_DropDownOpened(roomComboBox, null);
+
+                roomComboBox.SelectedItem = selectedRoom;
+            }
         }
 
         private void ResultReady(object sender, ResultReadyEventArgs e)
@@ -241,6 +253,51 @@ namespace RealStereo
             else
             {
                 workerThread.SetInputAudioDevice(audioDevice);
+            }
+        }
+
+        private void roomComboBox_DropDownOpened(object sender, EventArgs e)
+        {
+            ComboBox comboBox = sender as ComboBox;
+
+            object selectedItem = comboBox.SelectedItem;
+            comboBox.Items.Clear();
+            comboBox.Items.Add("None");
+            comboBox.SelectedIndex = 0;
+
+            foreach (string roomName in Configuration.GetInstance().Rooms.Keys)
+            {
+                comboBox.Items.Add(roomName);
+
+                if (roomName == selectedItem.ToString())
+                {
+                    comboBox.SelectedItem = roomName;
+                }
+            }
+
+            if (selectedItem == null)
+            {
+                comboBox.SelectedIndex = 0;
+            }
+        }
+
+        private void roomComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (startBalancingButton == null)
+            {
+                return;
+            }
+
+            ComboBox comboBox = sender as ComboBox;
+            if (comboBox.SelectedItem == null || comboBox.SelectedItem.ToString() == "None")
+            {
+                startBalancingButton.IsEnabled = false;
+            }
+            else
+            {
+                startBalancingButton.IsEnabled = true;
+                Configuration.GetInstance().SelectedRoom = comboBox.SelectedItem.ToString();
+                Configuration.GetInstance().Save();
             }
         }
 

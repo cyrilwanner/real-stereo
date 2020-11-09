@@ -3,7 +3,12 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30523.141
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RealStereo", "RealStereo\RealStereo.csproj", "{4DF90F97-18A5-4B2C-8CD6-A5CF6AE47519}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RealStereo", "RealStereo\RealStereo.csproj", "{4DF90F97-18A5-4B2C-8CD6-A5CF6AE47519}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F0CE2243-FA3C-42EE-8541-261018A30ADC}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

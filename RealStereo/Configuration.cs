@@ -1,13 +1,47 @@
-﻿
-using Emgu.CV.Aruco;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
-using System.Drawing;
+using System.IO;
 
 namespace RealStereo
 {
-    public class Configuration
+    class Configuration
     {
-        public Point Coordinates;
-        public Dictionary<int, float[]> Volumes; // Float array index 0 contains the recording volume of the 100% audio playback volume, index 1 the 50% audio playback volume
+        public Dictionary<string, List<PointConfiguration>> Rooms { get; set; } = new Dictionary<string, List<PointConfiguration>>();
+        public string SelectedRoom;
+
+        [JsonIgnore]
+        private static Configuration Config = null;
+
+        public static Configuration GetInstance()
+        {
+            if (Config != null)
+            {
+                return Config;
+            }
+
+            string basePath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+            string serialized;
+
+            try
+            {
+                serialized = File.ReadAllText(basePath + "\\realstereo.json");
+            }
+            catch
+            {
+                serialized = "{}";
+            }
+
+            Config = JsonConvert.DeserializeObject<Configuration>(serialized);
+
+            return Config;
+        }
+
+        public void Save()
+        {
+            string basePath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+            string serialized = JsonConvert.SerializeObject(this);
+            File.WriteAllText(basePath + "\\realstereo.json", serialized);
+        }
     }
 }

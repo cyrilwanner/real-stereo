@@ -8,6 +8,7 @@ namespace RealStereo
     public partial class ConfigurationWindow : Window
     {
         private ConfigurationManager manager;
+        private WorkerThread workerThread;
 
         public ConfigurationWindow()
         {
@@ -16,12 +17,20 @@ namespace RealStereo
 
         public void InitConfiguration(ref WorkerThread workerThread)
         {
-            manager = new ConfigurationManager(ref workerThread, instructionsText, instructionsBox, audioInputDeviceVolume, positions);
+            manager = new ConfigurationManager(ref workerThread, instructionsText, instructionsBox, audioInputDeviceVolume, positions, saveButton);
+            this.workerThread = workerThread;
+            UpdateStartButton();
+        }
 
-            // if all devices are set, enable the start button
-            if (workerThread.GetCameras().Keys.Count >= 2 && workerThread.GetOutputAudioDevice() != null && workerThread.GetInputAudioDevice() != null)
+        private void UpdateStartButton()
+        {
+            if (workerThread.GetCameras().Keys.Count >= 2 && workerThread.GetOutputAudioDevice() != null && workerThread.GetInputAudioDevice() != null && roomNameTextBox.Text.Trim().Length > 0 && !Configuration.GetInstance().Rooms.ContainsKey(roomNameTextBox.Text))
             {
                 startCalibrationButton.IsEnabled = true;
+            }
+            else
+            {
+                startCalibrationButton.IsEnabled = false;
             }
         }
 
@@ -46,6 +55,19 @@ namespace RealStereo
             {
                 manager.Cancel();
             }
+        }
+
+        private void SaveConfiguration(object sender, RoutedEventArgs e)
+        {
+            manager.Cancel();
+            Configuration.GetInstance().Rooms.Add(roomNameTextBox.Text, manager.GetConfigurations());
+            Configuration.GetInstance().Save();
+            Close();
+        }
+
+        private void RoomNameChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+        {
+            UpdateStartButton();
         }
     }
 }
