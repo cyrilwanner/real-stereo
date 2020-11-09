@@ -1,7 +1,5 @@
 using MediaFoundation;
 using NAudio.CoreAudioApi;
-using NAudio.Wave;
-using NAudio.Wave.SampleProviders;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,12 +25,26 @@ namespace RealStereo
             InitializeComponent();
 
             Loaded += new RoutedEventHandler(StartWorkerThread);
+            Loaded += new RoutedEventHandler(InitializeSelectedConfiguration);
         }
 
         private void StartWorkerThread(object sender, RoutedEventArgs e)
         {
             workerThread = new WorkerThread(ref cameras);
             workerThread.ResultReady += ResultReady;
+        }
+
+        private void InitializeSelectedConfiguration(object sender, RoutedEventArgs e)
+        {
+            string selectedRoom = Configuration.GetInstance().SelectedRoom;
+
+            if (selectedRoom != null)
+            {
+                // trigger dropdown population
+                roomComboBox_DropDownOpened(roomComboBox, null);
+
+                roomComboBox.SelectedItem = selectedRoom;
+            }
         }
 
         private void ResultReady(object sender, ResultReadyEventArgs e)
