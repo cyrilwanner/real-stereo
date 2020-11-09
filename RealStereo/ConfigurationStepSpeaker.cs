@@ -56,7 +56,7 @@ namespace RealStereo
             }
         }
 
-        public Configuration Finish(Configuration currentConfiguration)
+        public PointConfiguration Finish(PointConfiguration currentConfiguration)
         {
             MMDevice outputAudioDevice = workerThread.GetOutputAudioDevice();
             for (int i = 0; i < outputAudioDevice.AudioEndpointVolume.Channels.Count; i++)
