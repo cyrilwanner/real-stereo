@@ -37,6 +37,7 @@ namespace RealStereo
         private void CancelConfiguration(object sender, object e)
         {
             manager.Cancel();
+            manager.Terminate();
             Close();
         }
 
@@ -54,6 +55,7 @@ namespace RealStereo
             if (manager != null)
             {
                 manager.Cancel();
+                manager.Terminate();
             }
         }
 
@@ -62,6 +64,7 @@ namespace RealStereo
             manager.Cancel();
             Configuration.GetInstance().Rooms.Add(roomNameTextBox.Text, manager.GetConfigurations());
             Configuration.GetInstance().Save();
+            manager.Terminate();
             Close();
         }
 

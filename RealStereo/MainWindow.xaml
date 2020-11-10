@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:RealStereo"
         xmlns:System="clr-namespace:System;assembly=System.Runtime" x:Class="RealStereo.MainWindow"
         mc:Ignorable="d"
-        Title="Real Stereo" Height="500" Width="800" Closed="OnClosed">
+        Title="Real Stereo" Height="520" Width="800" Closed="OnClosed">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="1*" />

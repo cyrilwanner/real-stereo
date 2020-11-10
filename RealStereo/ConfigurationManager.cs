@@ -16,6 +16,7 @@ namespace RealStereo
         private ProgressBar audioInputDeviceVolume;
         private StackPanel positions;
         private Button saveButton;
+        private bool terminated = false;
 
         public ConfigurationManager(ref WorkerThread workerThread, TextBlock instructionsText, Border instructionsBox, ProgressBar audioInputDeviceVolume, StackPanel positions, Button saveButton)
         {
@@ -106,6 +107,16 @@ namespace RealStereo
         public List<PointConfiguration> GetConfigurations()
         {
             return configurations;
+        }
+
+        public void Terminate()
+        {
+            terminated = true;
+        }
+
+        public bool IsTerminated()
+        {
+            return terminated;
         }
     }
 }

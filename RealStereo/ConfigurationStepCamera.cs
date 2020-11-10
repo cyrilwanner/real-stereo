@@ -47,6 +47,11 @@ namespace RealStereo
             {
                 System.Windows.Application.Current.Dispatcher.Invoke(() =>
                 {
+                    if (manager.IsTerminated())
+                    {
+                        return;
+                    }
+
                     workerThread.ResultReady += ResultReady;
                     initialBalancingValue = workerThread.IsBalancing();
 
@@ -99,6 +104,11 @@ namespace RealStereo
 
                             Task.Delay(3000).ContinueWith(_ =>
                             {
+                                if (manager.IsTerminated())
+                                {
+                                    return;
+                                }
+
                                 System.Windows.Application.Current.Dispatcher.Invoke(() => manager.Start());
                             });
                         }
