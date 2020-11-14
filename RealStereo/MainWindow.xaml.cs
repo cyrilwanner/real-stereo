@@ -315,7 +315,6 @@ namespace RealStereo
         private void OnClosed(object sender, EventArgs e)
         {
             workerThread.Stop();
-            Application.Current.Shutdown();
         }
     }
 }
