@@ -32,7 +32,6 @@ namespace RealStereo
         {
             int scale = volumeInterpolation.GetScale();
             double[] minMax = GetMinMax();
-            System.Diagnostics.Debug.WriteLine(minMax[0]+","+minMax[1]);
 
             for (int x = 0; x < volumeInterpolation.Values.GetLength(0); x++)
             {

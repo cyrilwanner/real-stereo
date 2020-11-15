@@ -8,7 +8,6 @@
         Title="VolumeInterpolationDebugWindow"
         SizeToContent="WidthAndHeight">
     <Grid>
-        <Canvas x:Name="canvas" Width="500" Height="500"/>
-
+        <Canvas x:Name="canvas" Width="505" Height="510"/>
     </Grid>
 </Window>
