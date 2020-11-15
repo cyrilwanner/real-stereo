@@ -15,7 +15,6 @@ namespace RealStereo
         private Thread thread;
         private Dictionary<Image, Camera> cameras;
         private bool isBalancing = false;
-        private bool cancelled = false;
         private MMDevice outputAudioDevice;
         private MMDevice inputAudioDevice;
 
@@ -68,8 +67,7 @@ namespace RealStereo
 
         public void Stop()
         {
-            cancelled = true;
-            thread.Join();
+            thread.Interrupt();
         }
 
         protected virtual void OnResultReady(WorkerResult result)
@@ -85,12 +83,17 @@ namespace RealStereo
 
         private void Run()
         {
-            while (!cancelled)
+            try
             {
-                DoWork();
+                while (true)
+                {
+                    DoWork();
 
-                Thread.Sleep(1000 / FPS);
+                    Thread.Sleep(1000 / FPS);
+                }
             }
+            catch (ThreadInterruptedException)
+            {}
         }
 
         private void DoWork()
