@@ -9,10 +9,13 @@ namespace RealStereo
 {
     public class ConfigurationStepSpeaker : ConfigurationStep
     {
+        private static int TEST_TONE_LENGTH = 2;
+        private static float TEST_TONE_SCALING_TARGET = 0.5f;
         private ConfigurationManager manager;
         private WorkerThread workerThread;
         private TestTone testTone;
         private int speakerStep;
+        private float volumeScalingFactor;
         private Dictionary<int, float> originalChannelVolume = new Dictionary<int, float>();
         Dictionary<int, float[]> volumes = new Dictionary<int, float[]>();
         private bool isCanceled;
@@ -30,16 +33,26 @@ namespace RealStereo
             isCanceled = false;
             originalChannelVolume.Clear();
             speakerStep = 1;
+            volumeScalingFactor = 1;
             for (int i = 0; i < outputAudioDevice.AudioEndpointVolume.Channels.Count; i++)
             {
                 originalChannelVolume.Add(i, outputAudioDevice.AudioEndpointVolume.Channels[i].VolumeLevelScalar);
             }
-            MuteAllChannels();
 
             testTone = new TestTone(outputAudioDevice, inputAudioDevice);
-            manager.SetInstructions("Calibrating speakers channel " + (speakerStep / 2) + " - Step 1");
-            outputAudioDevice.AudioEndpointVolume.Channels[0].VolumeLevelScalar = originalChannelVolume[0];
-            testTone.Play(2, new EventHandler<StoppedEventArgs>(TestToneStopped));
+
+            manager.SetInstructions("Calibrating max volume");
+            testTone.Play(TEST_TONE_LENGTH, delegate (object sender, StoppedEventArgs e)
+            {
+                float maxVolume = testTone.GetAverageCaptureVolume();
+                volumeScalingFactor = TEST_TONE_SCALING_TARGET / maxVolume;
+                manager.SetAudioInputDeviceVolume(maxVolume * volumeScalingFactor);
+
+                MuteAllChannels();
+                manager.SetInstructions("Calibrating speakers channel " + (speakerStep / 2) + " - Step 1");
+                outputAudioDevice.AudioEndpointVolume.Channels[0].VolumeLevelScalar = originalChannelVolume[0];
+                testTone.Play(TEST_TONE_LENGTH, new EventHandler<StoppedEventArgs>(TestToneStopped));
+            });
         }
 
         public void Cancel()
@@ -87,7 +100,7 @@ namespace RealStereo
             {
                 volumes[(speakerStep - 1) / 2] = new float[2];
             }
-            float volume = testTone.GetAverageCaptureVolume();
+            float volume = testTone.GetAverageCaptureVolume() * volumeScalingFactor;
             manager.SetAudioInputDeviceVolume(volume);
             volumes[(speakerStep-1) / 2][(speakerStep-1) % 2] = volume;
 
@@ -99,7 +112,7 @@ namespace RealStereo
                 audioEndpointVolume.VolumeLevelScalar = originalChannelVolume[channelIndex];
                 speakerStep++;
                 manager.SetInstructions("Calibrating speakers channel " + channelIndex + " - Step 1");
-                testTone.Play(2, new EventHandler<StoppedEventArgs>(TestToneStopped));
+                testTone.Play(TEST_TONE_LENGTH, new EventHandler<StoppedEventArgs>(TestToneStopped));
             } else
             {
                 // Half volume same channel
@@ -107,7 +120,7 @@ namespace RealStereo
                 audioEndpointVolume.VolumeLevelScalar = originalChannelVolume[channelIndex] / 2;
                 speakerStep++;
                 manager.SetInstructions("Calibrating speakers channel " + channelIndex + " - Step 2");
-                testTone.Play(2, new EventHandler<StoppedEventArgs>(TestToneStopped));
+                testTone.Play(TEST_TONE_LENGTH, new EventHandler<StoppedEventArgs>(TestToneStopped));
                 // Detect volume for this channel
             }
         }
