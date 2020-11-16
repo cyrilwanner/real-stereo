@@ -17,6 +17,7 @@ namespace RealStereo
         private bool isBalancing = false;
         private MMDevice outputAudioDevice;
         private MMDevice inputAudioDevice;
+        private VolumeInterpolation volumeInterpolation;
 
         private static int FPS = 10;
 
@@ -63,6 +64,16 @@ namespace RealStereo
         public ref Dictionary<Image, Camera> GetCameras()
         {
             return ref cameras;
+        }
+
+        public void SetVolumeInterpolation(VolumeInterpolation volumeInterpolation)
+        {
+            this.volumeInterpolation = volumeInterpolation;
+        }
+
+        public VolumeInterpolation GetVolumeInterpolation()
+        {
+            return volumeInterpolation;
         }
 
         public void Stop()

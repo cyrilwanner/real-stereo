@@ -96,6 +96,7 @@ namespace RealStereo
                         label.Content = "Channel " + (channelIndex + 1);
                     }
                     label.Margin = new Thickness(0, channelIndex > 0 ? 5 : 0, 0, 0);
+                    label.MouseDoubleClick += OpenVolumeInterpolationDebugWindow;
                     channelLevelsPanel.Children.Add(label);
 
                     ProgressBar progressBar = new ProgressBar();
@@ -296,8 +297,12 @@ namespace RealStereo
             else
             {
                 startBalancingButton.IsEnabled = true;
-                Configuration.GetInstance().SelectedRoom = comboBox.SelectedItem.ToString();
+                string selectedRoom = comboBox.SelectedItem.ToString();
+
+                Configuration.GetInstance().SelectedRoom = selectedRoom;
                 Configuration.GetInstance().Save();
+
+                workerThread.SetVolumeInterpolation(new VolumeInterpolation(Configuration.GetInstance().Rooms[selectedRoom]));
             }
         }
 
@@ -309,6 +314,18 @@ namespace RealStereo
             window.Top = Top;
             window.Height = Height;
             window.InitConfiguration(ref workerThread);
+            window.ShowDialog();
+        }
+
+        private void OpenVolumeInterpolationDebugWindow(object sender, RoutedEventArgs e)
+        {
+            Label label = (Label)sender;
+            int speakerIndex = channelLevelsPanel.Children.IndexOf(label) / 2;
+
+            VolumeInterpolationDebugWindow window = new VolumeInterpolationDebugWindow();
+            window.SetVolumeInterpolation(workerThread.GetVolumeInterpolation());
+            window.SetSpeakerIndex(speakerIndex);
+            window.Draw();
             window.ShowDialog();
         }
 
