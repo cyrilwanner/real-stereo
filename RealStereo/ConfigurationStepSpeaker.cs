@@ -86,7 +86,7 @@ namespace RealStereo
                 outputAudioDevice.AudioEndpointVolume.Channels[i].VolumeLevelScalar = originalChannelVolume[i];
             }
 
-            currentConfiguration.Volumes = new Dictionary<int, float[]>(volumes);
+            currentConfiguration.Volumes = volumes;
             return currentConfiguration;
         }
 
