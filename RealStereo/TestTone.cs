@@ -4,9 +4,6 @@ using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
 using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Threading;
-using System.Windows;
 
 namespace RealStereo
 {
