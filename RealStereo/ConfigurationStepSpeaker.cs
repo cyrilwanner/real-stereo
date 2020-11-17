@@ -17,7 +17,7 @@ namespace RealStereo
         private int speakerStep;
         private float volumeScalingFactor = 0;
         private Dictionary<int, float> originalChannelVolume = new Dictionary<int, float>();
-        Dictionary<int, float[]> volumes = new Dictionary<int, float[]>();
+        Dictionary<int, float[]> volumes;
         private bool isCanceled;
 
         public ConfigurationStepSpeaker(ConfigurationManager manager, ref WorkerThread workerThread)
@@ -31,6 +31,7 @@ namespace RealStereo
             MMDevice outputAudioDevice = workerThread.GetOutputAudioDevice();
             MMDevice inputAudioDevice = workerThread.GetInputAudioDevice();
             isCanceled = false;
+            volumes = new Dictionary<int, float[]>();
             originalChannelVolume.Clear();
             speakerStep = 1;
             for (int i = 0; i < outputAudioDevice.AudioEndpointVolume.Channels.Count; i++)
