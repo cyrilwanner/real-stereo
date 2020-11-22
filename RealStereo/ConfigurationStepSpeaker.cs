@@ -107,7 +107,8 @@ namespace RealStereo
             int channelIndex = speakerStep / 2;
             if (!volumes.ContainsKey((speakerStep - 1) / 2))
             {
-                volumes[(speakerStep - 1) / 2] = new float[2];
+                volumes[(speakerStep - 1) / 2] = new float[3];
+                volumes[(speakerStep - 1) / 2][2] = originalChannelVolume[(speakerStep - 1) / 2];
             }
             float volume = testTone.GetAverageCaptureVolume() * volumeScalingFactor;
             manager.SetAudioInputDeviceVolume(volume);

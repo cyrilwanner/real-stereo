@@ -40,7 +40,7 @@ namespace RealStereo
                     Rectangle rect = new Rectangle();
                     rect.Width = scale;
                     rect.Height = scale;
-                    byte intensity = (byte)(255 - (255 / (minMax[1] - minMax[0])) * (volumeInterpolation.Values[x, y, speakerIndex] - minMax[0]));
+                    byte intensity = (byte)(255 - (255 / (minMax[1] - minMax[0])) * (volumeInterpolation.Values[x, y, speakerIndex, 0] - minMax[0]));
                     rect.Fill = new SolidColorBrush(Color.FromRgb(intensity, intensity, 255));
 
                     canvas.Children.Add(rect);
@@ -58,7 +58,7 @@ namespace RealStereo
             {
                 for (int y = 0; y < volumeInterpolation.Values.GetLength(1); y++)
                 {
-                    double value = volumeInterpolation.Values[x, y, speakerIndex];
+                    double value = volumeInterpolation.Values[x, y, speakerIndex, 0];
 
                     if (value < minMax[0])
                     {
