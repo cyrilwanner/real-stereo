@@ -9,11 +9,11 @@ namespace RealStereo
         private static int TARGET_SIZE = 100;
         private static int POWER = 2;
 
-        public double[,,] Values;
+        public double[,,,] Values;
 
         public VolumeInterpolation(List<PointConfiguration> points)
         {
-            Values = new double[TARGET_SIZE + 1, TARGET_SIZE + 1, points[0].Volumes.Count];
+            Values = new double[TARGET_SIZE + 1, TARGET_SIZE + 1, points[0].Volumes.Count, 2];
             CalculateValues(points);
         }
 
@@ -37,7 +37,8 @@ namespace RealStereo
                     for (int speaker = 0; speaker < points[0].Volumes.Count; speaker++)
                     {
                         double totalWeight = 0;
-                        double totalValue = 0;
+                        double totalFullVolume = 0;
+                        double totalHalfVolume = 0;
                         bool valueSet = false;
 
                         foreach (PointConfiguration point in points)
@@ -47,7 +48,8 @@ namespace RealStereo
 
                             if (pointX == x && pointY == y)
                             {
-                                Values[x, y, speaker] = point.Volumes[speaker][0];
+                                Values[x, y, speaker, 0] = point.Volumes[speaker][0];
+                                Values[x, y, speaker, 1] = (Values[x, y, speaker, 0] - point.Volumes[speaker][1]) / ((int) (point.Volumes[speaker][2] * 100) - (int) (point.Volumes[speaker][2] * 100) / 2);
                                 valueSet = true;
                                 break;
                             }
@@ -56,13 +58,18 @@ namespace RealStereo
                             int distanceY = pointY - y;
                             double weight = Math.Pow(Math.Sqrt(distanceX * distanceX + distanceY * distanceY), POWER);
                             weight = 1 / weight;
-                            totalValue += weight * point.Volumes[speaker][0];
+                            totalFullVolume += weight * point.Volumes[speaker][0];
+                            totalHalfVolume += weight * point.Volumes[speaker][1];
                             totalWeight += weight;
                         }
 
                         if (!valueSet)
                         {
-                            Values[x, y, speaker] = totalValue / totalWeight;
+                            // store volume level at index 0
+                            Values[x, y, speaker, 0] = totalFullVolume / totalWeight;
+
+                            // store the difference that 1% change of the speaker volume does
+                            Values[x, y, speaker, 1] = (Values[x, y, speaker, 0] - (totalHalfVolume / totalWeight)) / ((int) (points[0].Volumes[speaker][2] * 100) - (int) (points[0].Volumes[speaker][2] * 100) / 2);
                         }
                     }
                 }
