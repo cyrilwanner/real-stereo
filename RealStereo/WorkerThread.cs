@@ -139,6 +139,11 @@ namespace RealStereo
                 result.SetCoordinates(coordinates);
             }
 
+            for (int i = 0; i < outputAudioDevice.AudioEndpointVolume.Channels.Count; i++)
+            {
+                outputAudioDevice.AudioEndpointVolume.Channels[i].VolumeLevelScalar = (float) volumeInterpolation.GetVolumeForPositionAndSpeaker(coordinates.X, coordinates.Y, i);
+            }
+
             if (Application.Current != null)
             {
                 Application.Current.Dispatcher.Invoke(() => OnResultReady(result));
