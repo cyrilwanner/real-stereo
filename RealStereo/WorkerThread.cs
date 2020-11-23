@@ -160,7 +160,16 @@ namespace RealStereo
 
             if (Application.Current != null)
             {
-                Application.Current.Dispatcher.Invoke(() => OnResultReady(result));
+                Application.Current.Dispatcher.Invoke(() => {
+                    OnResultReady(result);
+                    if (isBalancing)
+                    {
+                        if (Application.Current.MainWindow is MainWindow)
+                        {
+                            ((MainWindow)Application.Current.MainWindow).UpdateChannelLevels();
+                        }
+                    }
+                });
             }
         }
     }
