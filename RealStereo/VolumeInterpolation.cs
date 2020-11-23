@@ -9,11 +9,15 @@ namespace RealStereo
         private static int TARGET_SIZE = 100;
         private static int POWER = 2;
 
+        private float targetVolume;
+        private List<PointConfiguration> points;
         public double[,,,] Values;
 
         public VolumeInterpolation(List<PointConfiguration> points)
         {
+            this.points = points;
             Values = new double[TARGET_SIZE + 1, TARGET_SIZE + 1, points[0].Volumes.Count, 2];
+            targetVolume = CalculateMaxVolume(points);
             CalculateValues(points);
         }
 
@@ -25,6 +29,23 @@ namespace RealStereo
         public int MapCoordinate(int x)
         {
             return x / (ORIGIN_SIZE / TARGET_SIZE);
+        }
+
+        private float CalculateMaxVolume(List<PointConfiguration> points)
+        {
+            float maxVolume = 0;
+            foreach (PointConfiguration pointConfiguration in points)
+            {
+                for (int speaker = 0; speaker < pointConfiguration.Volumes.Count; speaker++)
+                {
+                    if (pointConfiguration.Volumes[speaker][0] > maxVolume)
+                    {
+                        maxVolume = pointConfiguration.Volumes[speaker][0];
+                    }
+                }
+            }
+
+            return maxVolume;
         }
 
         private void CalculateValues(List<PointConfiguration> points)
@@ -75,5 +96,13 @@ namespace RealStereo
                 }
             }
         }
+
+        public double GetVolumeForPositionAndSpeaker(int x, int y, int speakerIndex)
+        {
+            int mapped_x = MapCoordinate(x);
+            int mapped_y = MapCoordinate(y);
+            double volumeDifference = targetVolume - Values[mapped_x, mapped_y, speakerIndex, 0];
+            return points[0].Volumes[speakerIndex][2] - (volumeDifference / Values[mapped_x, mapped_y, speakerIndex, 1]);
+        } 
     }
 }

@@ -108,7 +108,7 @@ namespace RealStereo
             UpdateChannelLevels();
         }
 
-        private void UpdateChannelLevels()
+        public void UpdateChannelLevels()
         {
             if (audioOutputComboBox.SelectedItem is MMDevice)
             {
