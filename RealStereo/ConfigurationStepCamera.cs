@@ -53,18 +53,19 @@ namespace RealStereo
                     }
 
                     workerThread.ResultReady += ResultReady;
-                    initialBalancingValue = workerThread.IsBalancing();
-
                     if (!initialBalancingValue)
                     {
-                        workerThread.SetBalancing(true);
+                        initialBalancingValue = workerThread.IsBalancing();
                     }
+                    workerThread.SetCalibrating(true);
+                    workerThread.SetBalancing(false);
                 });
             });
         }
 
         public void Cancel()
         {
+            workerThread.SetCalibrating(false);
             workerThread.SetBalancing(initialBalancingValue);
             workerThread.ResultReady -= ResultReady;
             isActiveStep = false;

@@ -99,7 +99,9 @@ namespace RealStereo
 
         public double GetVolumeForPositionAndSpeaker(int x, int y, int speakerIndex)
         {
-            double volumeDifference = targetVolume - Values[x, y, speakerIndex, 0];
+            int mapped_x = MapCoordinate(x);
+            int mapped_y = MapCoordinate(y);
+            double volumeDifference = targetVolume - Values[mapped_x, mapped_y, speakerIndex, 0];
             return points[0].Volumes[speakerIndex][2] - (volumeDifference / Values[x, y, speakerIndex, 1]);
         } 
     }

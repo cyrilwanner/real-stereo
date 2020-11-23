@@ -15,6 +15,7 @@ namespace RealStereo
         private Thread thread;
         private Dictionary<Image, Camera> cameras;
         private bool isBalancing = false;
+        private bool isCalibrating = false;
         private MMDevice outputAudioDevice;
         private MMDevice inputAudioDevice;
         private VolumeInterpolation volumeInterpolation;
@@ -34,6 +35,11 @@ namespace RealStereo
         public void SetBalancing(bool isBalancing)
         {
             this.isBalancing = isBalancing;
+        }
+
+        public void SetCalibrating(bool isCalibrating)
+        {
+            this.isCalibrating = isCalibrating;
         }
 
         public void SetOutputAudioDevice(MMDevice outputAudioDevice)
@@ -59,6 +65,11 @@ namespace RealStereo
         public bool IsBalancing()
         {
             return isBalancing;
+        }
+
+        public bool IsCalibrating()
+        {
+            return isCalibrating;
         }
 
         public ref Dictionary<Image, Camera> GetCameras()
@@ -118,7 +129,7 @@ namespace RealStereo
                 Image image = cameras.Keys.ElementAt(i);
                 Camera camera = cameras[image];
 
-                camera.Process(isBalancing);
+                camera.Process(isBalancing || isCalibrating);
                 result.SetFrame(i, camera.GetFrame());
                 Point? cameraCoordinates = camera.GetCoordinates(i % 2 == 0 ? Orientation.Horizontal : Orientation.Vertical);
 
@@ -139,9 +150,12 @@ namespace RealStereo
                 result.SetCoordinates(coordinates);
             }
 
-            for (int i = 0; i < outputAudioDevice.AudioEndpointVolume.Channels.Count; i++)
+            if (isBalancing)
             {
-                outputAudioDevice.AudioEndpointVolume.Channels[i].VolumeLevelScalar = (float) volumeInterpolation.GetVolumeForPositionAndSpeaker(coordinates.X, coordinates.Y, i);
+                for (int i = 0; i < outputAudioDevice.AudioEndpointVolume.Channels.Count; i++)
+                {
+                    outputAudioDevice.AudioEndpointVolume.Channels[i].VolumeLevelScalar = (float)volumeInterpolation.GetVolumeForPositionAndSpeaker(coordinates.X, coordinates.Y, i);
+                }
             }
 
             if (Application.Current != null)
