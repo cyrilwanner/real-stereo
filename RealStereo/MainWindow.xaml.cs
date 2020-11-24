@@ -323,7 +323,7 @@ namespace RealStereo
             int speakerIndex = channelLevelsPanel.Children.IndexOf(label) / 2;
 
             VolumeInterpolationDebugWindow window = new VolumeInterpolationDebugWindow();
-            window.SetVolumeInterpolation(workerThread.GetVolumeInterpolation());
+            window.SetWorkerThread(workerThread);
             window.SetSpeakerIndex(speakerIndex);
             window.Draw();
             window.ShowDialog();
