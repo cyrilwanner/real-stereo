@@ -27,6 +27,10 @@ namespace RealStereo
         public void Process(bool detectPeople)
         {
             Mat rawFrame = capture.QueryFrame();
+            if (rawFrame == null)
+            {
+                return;
+            }
 
             // resize image for more performant detection
             frame = rawFrame.ToImage<Bgr, byte>();
