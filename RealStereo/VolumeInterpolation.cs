@@ -102,7 +102,8 @@ namespace RealStereo
             int mapped_x = MapCoordinate(x);
             int mapped_y = MapCoordinate(y);
             double volumeDifference = targetVolume - Values[mapped_x, mapped_y, speakerIndex, 0];
-            return points[0].Volumes[speakerIndex][2] - (volumeDifference / Values[mapped_x, mapped_y, speakerIndex, 1]);
+            double volume = points[0].Volumes[speakerIndex][2] - (volumeDifference / Values[mapped_x, mapped_y, speakerIndex, 1]) / 100;
+            return Math.Max(Math.Min(volume, 1.0), 0.0);
         } 
     }
 }

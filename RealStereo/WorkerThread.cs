@@ -148,13 +148,13 @@ namespace RealStereo
             if (applyCoordinates)
             {
                 result.SetCoordinates(coordinates);
-            }
 
-            if (isBalancing)
-            {
-                for (int i = 0; i < outputAudioDevice.AudioEndpointVolume.Channels.Count; i++)
+                if (isBalancing)
                 {
-                    outputAudioDevice.AudioEndpointVolume.Channels[i].VolumeLevelScalar = (float)volumeInterpolation.GetVolumeForPositionAndSpeaker(coordinates.X, coordinates.Y, i);
+                    for (int i = 0; i < outputAudioDevice.AudioEndpointVolume.Channels.Count; i++)
+                    {
+                        outputAudioDevice.AudioEndpointVolume.Channels[i].VolumeLevelScalar = (float)volumeInterpolation.GetVolumeForPositionAndSpeaker(coordinates.X, coordinates.Y, i);
+                    }
                 }
             }
 
