@@ -55,7 +55,7 @@ namespace RealStereo
             currentPosition = new Rectangle();
             currentPosition.Width = scale;
             currentPosition.Height = scale;
-            currentPosition.Fill = Brushes.Green;
+            currentPosition.Fill = Brushes.Orange;
             canvas.Children.Add(currentPosition);
             Canvas.SetLeft(currentPosition, -10);
             Canvas.SetTop(currentPosition, -10);
