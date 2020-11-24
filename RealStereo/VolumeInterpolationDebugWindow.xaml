@@ -6,7 +6,8 @@
         xmlns:local="clr-namespace:RealStereo"
         mc:Ignorable="d"
         Title="VolumeInterpolationDebugWindow"
-        SizeToContent="WidthAndHeight">
+        SizeToContent="WidthAndHeight"
+        Closing="OnClosing">
     <Grid>
         <Canvas x:Name="canvas" Width="505" Height="510"/>
     </Grid>

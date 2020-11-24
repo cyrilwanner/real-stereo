@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System.ComponentModel;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
@@ -10,17 +11,18 @@ namespace RealStereo
     /// </summary>
     public partial class VolumeInterpolationDebugWindow : Window
     {
-        private VolumeInterpolation volumeInterpolation;
+        private WorkerThread workerThread;
         private int speakerIndex;
+        private Rectangle currentPosition;
 
         public VolumeInterpolationDebugWindow()
         {
             InitializeComponent();
         }
 
-        public void SetVolumeInterpolation(VolumeInterpolation volumeInterpolation)
+        public void SetWorkerThread(WorkerThread workerThread)
         {
-            this.volumeInterpolation = volumeInterpolation;
+            this.workerThread = workerThread;
         }
 
         public void SetSpeakerIndex(int speakerIndex)
@@ -30,6 +32,7 @@ namespace RealStereo
 
         public void Draw()
         {
+            VolumeInterpolation volumeInterpolation = workerThread.GetVolumeInterpolation();
             int scale = volumeInterpolation.GetScale();
             double[] minMax = GetMinMax();
 
@@ -48,10 +51,21 @@ namespace RealStereo
                     Canvas.SetTop(rect, (volumeInterpolation.Values.GetLength(1) - y) * scale);
                 }
             }
+
+            currentPosition = new Rectangle();
+            currentPosition.Width = scale;
+            currentPosition.Height = scale;
+            currentPosition.Fill = Brushes.Orange;
+            canvas.Children.Add(currentPosition);
+            Canvas.SetLeft(currentPosition, -10);
+            Canvas.SetTop(currentPosition, -10);
+
+            workerThread.ResultReady += ResultReady;
         }
 
         private double[] GetMinMax()
         {
+            VolumeInterpolation volumeInterpolation = workerThread.GetVolumeInterpolation();
             double[] minMax = new double[2] { 1000, -1000 };
 
             for (int x = 0; x < volumeInterpolation.Values.GetLength(0); x++)
@@ -73,6 +87,22 @@ namespace RealStereo
             }
 
             return minMax;
+        }
+
+        private void ResultReady(object sender, ResultReadyEventArgs e)
+        {
+            if (e.Result.GetCoordinates().HasValue)
+            {
+                VolumeInterpolation volumeInterpolation = workerThread.GetVolumeInterpolation();
+                int scale = volumeInterpolation.GetScale();
+                Canvas.SetLeft(currentPosition, volumeInterpolation.MapCoordinate(e.Result.GetCoordinates().Value.X) * scale);
+                Canvas.SetTop(currentPosition, (volumeInterpolation.Values.GetLength(1) - volumeInterpolation.MapCoordinate(e.Result.GetCoordinates().Value.Y)) * scale);
+            }
+        }
+
+        private void OnClosing(object sender, CancelEventArgs e)
+        {
+            workerThread.ResultReady -= ResultReady;
         }
     }
 }
