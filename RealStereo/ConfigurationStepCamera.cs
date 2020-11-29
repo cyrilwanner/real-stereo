@@ -17,7 +17,7 @@ namespace RealStereo
         private long lastMove = 0;
         private List<Point> coordinates = new List<Point>();
 
-        private static int MOVE_THRESHOLD = 40;
+        private static int MOVE_THRESHOLD = 60;
         private static int STAND_STILL_TIME = 3;
 
         public ConfigurationStepCamera(ConfigurationManager manager, ref WorkerThread workerThread)

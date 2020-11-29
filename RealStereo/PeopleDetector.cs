@@ -12,6 +12,7 @@ namespace RealStereo
         private HOGDescriptor hogDescriptor;
         private static int GROUP_THRESHOLD = 50;
         private static int HISTORY_SIZE = 2;
+        private static double SCORE_THRESHOLD = 0.3;
 
         public PeopleDetector()
         {
@@ -21,7 +22,18 @@ namespace RealStereo
 
         public MCvObjectDetection[] Detect(Image<Bgr, byte> frame)
         {
-            return hogDescriptor.DetectMultiScale(frame, 0, new Size(2, 2), new Size(8, 8));
+            MCvObjectDetection[] regions = hogDescriptor.DetectMultiScale(frame, 0, new Size(2, 2), new Size(8, 8));
+            List<MCvObjectDetection> filteredRegions = new List<MCvObjectDetection>();
+
+            foreach (MCvObjectDetection region in regions)
+            {
+                if (region.Score >= SCORE_THRESHOLD)
+                {
+                    filteredRegions.Add(region);
+                }
+            }
+
+            return filteredRegions.ToArray();
         }
 
         public MCvObjectDetection[] Normalize(MCvObjectDetection[] regions, MCvObjectDetection[] previousPeople, List<MCvObjectDetection[]> history)
