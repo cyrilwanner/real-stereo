@@ -43,7 +43,7 @@ namespace RealStereo
             lastMove = 0;
             lastCoordinates = null;
 
-            Task.Delay(3000).ContinueWith(_ =>
+            Task.Delay(5000).ContinueWith(_ =>
             {
                 System.Windows.Application.Current.Dispatcher.Invoke(() =>
                 {
@@ -53,14 +53,15 @@ namespace RealStereo
                     }
 
                     workerThread.ResultReady += ResultReady;
-                    if (!initialBalancingValue)
-                    {
-                        initialBalancingValue = workerThread.IsBalancing();
-                    }
-                    workerThread.SetCalibrating(true);
-                    workerThread.SetBalancing(false);
                 });
             });
+
+            if (!initialBalancingValue)
+            {
+                initialBalancingValue = workerThread.IsBalancing();
+            }
+            workerThread.SetCalibrating(true);
+            workerThread.SetBalancing(false);
         }
 
         public void Cancel()

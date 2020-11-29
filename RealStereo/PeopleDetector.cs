@@ -12,7 +12,7 @@ namespace RealStereo
         private HOGDescriptor hogDescriptor;
         private static int GROUP_THRESHOLD = 50;
         private static int HISTORY_SIZE = 2;
-        private static double SCORE_THRESHOLD = 0.3;
+        private static double SCORE_THRESHOLD = 0.1;
 
         public PeopleDetector()
         {
