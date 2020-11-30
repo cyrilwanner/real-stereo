@@ -319,6 +319,11 @@ namespace RealStereo
 
         private void OpenVolumeInterpolationDebugWindow(object sender, RoutedEventArgs e)
         {
+            if (Configuration.GetInstance().SelectedRoom == null)
+            {
+                return;
+            }
+
             Label label = (Label)sender;
             int speakerIndex = channelLevelsPanel.Children.IndexOf(label) / 2;
 

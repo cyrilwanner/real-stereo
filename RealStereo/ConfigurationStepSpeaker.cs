@@ -55,7 +55,8 @@ namespace RealStereo
                     outputAudioDevice.AudioEndpointVolume.Channels[0].VolumeLevelScalar = originalChannelVolume[0];
                     testTone.Play(TEST_TONE_LENGTH, new EventHandler<StoppedEventArgs>(TestToneStopped));
                 });
-            } else
+            }
+            else
             {
                 MuteAllChannels();
                 manager.SetInstructions("Calibrating speakers channel " + (speakerStep / 2) + " - Step 1");
