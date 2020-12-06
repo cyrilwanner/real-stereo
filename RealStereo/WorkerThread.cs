@@ -19,12 +19,15 @@ namespace RealStereo
         private MMDevice outputAudioDevice;
         private MMDevice inputAudioDevice;
         private VolumeInterpolation volumeInterpolation;
+        private VolumeFader volumeFader;
 
         private static int FPS = 10;
 
         public WorkerThread(ref Dictionary<Image, Camera> cameras)
         {
             this.cameras = cameras;
+
+            volumeFader = new VolumeFader(this);
 
             thread = new Thread(Run);
             thread.Start();
@@ -115,7 +118,9 @@ namespace RealStereo
                 }
             }
             catch (ThreadInterruptedException)
-            {}
+            {
+                volumeFader.Cancel();
+            }
         }
 
         private void DoWork()
@@ -151,10 +156,12 @@ namespace RealStereo
 
                 if (isBalancing)
                 {
+                    float[] channels = new float[outputAudioDevice.AudioEndpointVolume.Channels.Count];
                     for (int i = 0; i < outputAudioDevice.AudioEndpointVolume.Channels.Count; i++)
                     {
-                        outputAudioDevice.AudioEndpointVolume.Channels[i].VolumeLevelScalar = (float)volumeInterpolation.GetVolumeForPositionAndSpeaker(coordinates.X, coordinates.Y, i);
+                        channels[i] = (float)volumeInterpolation.GetVolumeForPositionAndSpeaker(coordinates.X, coordinates.Y, i);
                     }
+                    volumeFader.Set(channels);
                 }
             }
 

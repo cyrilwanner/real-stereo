@@ -65,7 +65,6 @@ namespace RealStereo
 
         private void ToggleBalancing(object sender, RoutedEventArgs e)
         {
-
             isBalancing = !isBalancing;
             workerThread.SetBalancing(isBalancing);
 
