@@ -1,5 +1,4 @@
-﻿
-namespace RealStereo
+﻿namespace RealStereo.Config.Steps
 {
     interface ConfigurationStep
     {

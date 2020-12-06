@@ -1,10 +1,10 @@
-﻿
+﻿using RealStereo.Balancing;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Threading.Tasks;
 
-namespace RealStereo
+namespace RealStereo.Config.Steps
 {
     public class ConfigurationStepCamera : ConfigurationStep
     {

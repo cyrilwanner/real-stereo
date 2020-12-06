@@ -1,7 +1,7 @@
 ﻿using NAudio.CoreAudioApi;
 using System.Threading;
 
-namespace RealStereo
+namespace RealStereo.Balancing.Speaker
 {
     class VolumeFader
     {

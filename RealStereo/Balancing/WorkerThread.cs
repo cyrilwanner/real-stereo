@@ -1,4 +1,7 @@
 ﻿using NAudio.CoreAudioApi;
+using RealStereo.Balancing.Speaker;
+using RealStereo.Balancing.Tracking;
+using RealStereo.Ui;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +11,7 @@ using System.Windows.Controls;
 using Image = System.Windows.Controls.Image;
 using Point = System.Drawing.Point;
 
-namespace RealStereo
+namespace RealStereo.Balancing
 {
     public class WorkerThread
     {

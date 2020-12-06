@@ -1,5 +1,9 @@
 using MediaFoundation;
 using NAudio.CoreAudioApi;
+using RealStereo.Balancing;
+using RealStereo.Balancing.Speaker;
+using RealStereo.Balancing.Tracking;
+using RealStereo.Config;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +12,7 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using Image = System.Windows.Controls.Image;
 
-namespace RealStereo
+namespace RealStereo.Ui
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml

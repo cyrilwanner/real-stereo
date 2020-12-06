@@ -1,11 +1,10 @@
-﻿
-using NAudio.CoreAudioApi;
+﻿using NAudio.CoreAudioApi;
 using NAudio.Wave;
+using RealStereo.Balancing;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 
-namespace RealStereo
+namespace RealStereo.Config.Steps
 {
     public class ConfigurationStepSpeaker : ConfigurationStep
     {

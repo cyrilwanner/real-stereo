@@ -1,7 +1,8 @@
-﻿using System;
+﻿using RealStereo.Config;
+using System;
 using System.Collections.Generic;
 
-namespace RealStereo
+namespace RealStereo.Balancing.Speaker
 {
     public class VolumeInterpolation
     {
