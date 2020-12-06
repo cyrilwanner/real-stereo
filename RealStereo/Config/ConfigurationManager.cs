@@ -1,9 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using RealStereo.Balancing;
+using RealStereo.Config.Steps;
+using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Controls;
 using System.Windows.Media;
 
-namespace RealStereo
+namespace RealStereo.Config
 {
     public class ConfigurationManager
     {

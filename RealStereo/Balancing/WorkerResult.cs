@@ -1,7 +1,7 @@
 ﻿using System.Drawing;
 using System.Windows.Media.Imaging;
 
-namespace RealStereo
+namespace RealStereo.Balancing
 {
     public class WorkerResult
     {

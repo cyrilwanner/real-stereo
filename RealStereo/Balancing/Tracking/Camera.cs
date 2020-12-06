@@ -8,7 +8,7 @@ using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 using Inter = Emgu.CV.CvEnum.Inter;
 
-namespace RealStereo
+namespace RealStereo.Balancing.Tracking
 {
     public class Camera
     {

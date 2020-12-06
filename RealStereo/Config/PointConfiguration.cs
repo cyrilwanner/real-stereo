@@ -1,8 +1,7 @@
-﻿
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Drawing;
 
-namespace RealStereo
+namespace RealStereo.Config
 {
     public class PointConfiguration
     {

@@ -1,6 +1,8 @@
-﻿using System.Windows;
+﻿using RealStereo.Balancing;
+using RealStereo.Config;
+using System.Windows;
 
-namespace RealStereo
+namespace RealStereo.Ui
 {
     /// <summary>
     /// Interaction logic for ConfigurationWindow.xaml

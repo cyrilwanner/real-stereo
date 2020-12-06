@@ -1,10 +1,12 @@
-﻿using System.ComponentModel;
+﻿using RealStereo.Balancing;
+using RealStereo.Balancing.Speaker;
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
 
-namespace RealStereo
+namespace RealStereo.Ui
 {
     /// <summary>
     /// Interaction logic for VolumeInterpolationDebugWindow.xaml

@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 
-namespace RealStereo
+namespace RealStereo.Balancing.Tracking
 {
     public class PeopleDetector
     {
