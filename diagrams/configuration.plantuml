@@ -1,0 +1,60 @@
+@startuml ClassDiagram
+skinparam defaultTextAlignment center
+skinparam nodesep 0
+allowmixing
+
+
+package "RealStereo.Config" as Config {
+  class Configuration {
+    + string SelectedRoom
+    + {static} Configuration GetInstance()
+    + Dictionary<string, List<PointConfiguration>> GetRooms()
+  }
+
+  class ConfigurationManager {
+    ConfigurationStep[] Steps
+    + void Start()
+    + void NextStep()
+    + void NextPosition()
+    + void Cancel()
+    + void SetInstructions(string instruction)
+    + void SetError(string error)
+    + void SetAudioInputDeviceVolume(float volume)
+    + List<PointConfiguration> GetConfigurations()
+    + void Terminate()
+    + bool IsTerminated()
+  }
+
+  class PointConfiguration {
+    +  Coordinates
+    + Dictionary<int, float[]> Volumes
+  }
+}
+
+package "RealStereo.Config.Steps" as Steps {
+  interface ConfigurationStep {
+    + void Start()
+    + PointConfiguration Finish(PointConfiguration currentConfiguration)
+    + void Cancel()
+  }
+
+  class ConfigurationStepCamera implements ConfigurationStep {
+    - {static} int MOVE_THRESHOLD = 60
+    - {static} int STAND_STILL_TIME = 3
+    - void ResultReady(object sender, ResultReadyEventArgs eventArgs)
+    - bool DidMove(Point coordinates)
+  }
+
+  class ConfigurationStepSpeaker implements ConfigurationStep {
+    - {static} int TEST_TONE_LENGTH = 2
+    - {static} int TEST_TONE_SCALING_TARGET = 0.5f
+    - void TestToneStopped(object sender, StoppedEventArgs eventArgs)
+    - void MuteAllChannels()
+  }
+}
+
+ConfigurationManager --* ConfigurationStep: uses >
+PointConfiguration "*" -- ConfigurationManager: generates <
+Configuration -- "*" PointConfiguration: stores >
+
+@enduml
