@@ -7,12 +7,12 @@ allowmixing
 package "RealStereo.Config" as Config {
   class Configuration {
     + string SelectedRoom
-    + {static} Configuration GetInstance()
+    + {static} Configuration GetInstance()
     + Dictionary<string, List<PointConfiguration>> GetRooms()
   }
 
   class ConfigurationManager {
-    ConfigurationStep[] Steps
+    - ConfigurationStep[] Steps
     + void Start()
     + void NextStep()
     + void NextPosition()
@@ -26,7 +26,7 @@ package "RealStereo.Config" as Config {
   }
 
   class PointConfiguration {
-    +  Coordinates
+    + Point Coordinates
     + Dictionary<int, float[]> Volumes
   }
 }
@@ -41,14 +41,14 @@ package "RealStereo.Config.Steps" as Steps {
   class ConfigurationStepCamera implements ConfigurationStep {
     - {static} int MOVE_THRESHOLD = 60
     - {static} int STAND_STILL_TIME = 3
-    - void ResultReady(object sender, ResultReadyEventArgs eventArgs)
+    - void ResultReady(object sender, ResultReadyEventArgs e)
     - bool DidMove(Point coordinates)
   }
 
   class ConfigurationStepSpeaker implements ConfigurationStep {
     - {static} int TEST_TONE_LENGTH = 2
     - {static} int TEST_TONE_SCALING_TARGET = 0.5f
-    - void TestToneStopped(object sender, StoppedEventArgs eventArgs)
+    - void TestToneStopped(object sender, StoppedEventArgs e)
     - void MuteAllChannels()
   }
 }
