@@ -1,0 +1,81 @@
+@startuml ClassDiagram
+skinparam defaultTextAlignment center
+skinparam nodesep 0
+allowmixing
+
+
+package "RealStereo.Balancing" as Balancing {
+  class WorkerResult {
+    + void SetCoordinates(Point coordinates)
+    + void SetFrame(int camera, BitmapImage frame)
+    + Point? GetCoordinates()
+    + BitmapImage[] GetFrames()
+  }
+
+  class WorkerThread {
+    - bool IsBalancing
+    - bool IsCalibrating
+    - MMDevice OutputAudioDevice
+    - MMDevice InputAudioDevice
+    - VolumeInterpolation VolumeInterpolation
+    - VolumeFader VolumeFader
+    + event EventHandler<ResultReadyEventArgs> ResultReady;
+    + void Stop()
+    # void OnResultReady(WorkerResult result)
+    - void Run()
+    - void DoWork()
+  }
+}
+
+package "RealStereo.Balancing.Speaker" as Speaker {
+  class AudioChannelMap {
+    + Dictionary<int, string> Map
+  }
+
+  class VolumeFader {
+    + void Set(float[] channels)
+    + void Cancel()
+    - void Run()
+  }
+
+  class VolumeInterpolation {
+    - {static} int ORIGIN_SIZE = 500
+    - {static} int TARGET_SIZE = 100
+    - {static} double POWER = 1.5
+    + double[,,,] Values
+    + int GetScale()
+    + int MapCoordinate(int x)
+    + double GetVolumeForPositionAndSpeaker(int x, int y, int speakerIndex)
+    - float CalculateMaxVolumeLevel(List<PointConfiguration> points)
+    - void CalculateValues(List<PointConfiguration> points)
+  }
+}
+
+package "RealStereo.Balancing.Tracking" as Tracking {
+  class Camera {
+    + void Process(bool detectPeople)
+    + BitmapImage GetFrame()
+    + Point? GetCoordinates(Orientation orientation)
+    - BitmapImage ToBitmapImage(Bitmap bitmap)
+    - void DrawRegions(MCvObjectDetection[] regions, Bgr color, int thickness)
+  }
+
+  class PeopleDetector {
+    - {static} int GROUP_THRESHOLD = 50
+    - {static} int HISTORY_SIZE = 2
+    - {static} int SCORE_THRESHOLD = 0.1
+    + MCvObjectDetection[] Detect(Image<Bgr, byte> frame)
+    + MCvObjectDetection[] Normalize(MCvObjectDetection[] regions,\n MCvObjectDetection[] previousPeople, List<MCvObjectDetection[]> history)
+    + void RotateHistory(MCvObjectDetection[] people, ref List<MCvObjectDetection[]> history)
+    - Rectangle EnlargeRectangle(Rectange rectangle)
+    - MCvObjectDetection[] FilterNewPeople(List<MCvObjectDetection> regions,\n MCvObjectDetection[] previousPeople, List<MCvObjectDetection[]> history)
+  }
+}
+
+WorkerThread *- "*" WorkerResult: generates >
+WorkerThread -- "1" VolumeFader: uses >
+WorkerThread -- "1" VolumeInterpolation: uses >
+Camera "2" -- WorkerThread: uses <
+PeopleDetector "1" --*  Camera: uses <
+
+@enduml

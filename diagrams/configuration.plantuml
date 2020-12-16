@@ -53,7 +53,7 @@ package "RealStereo.Config.Steps" as Steps {
   }
 }
 
-ConfigurationManager --* ConfigurationStep: uses >
+ConfigurationManager *-- ConfigurationStep: uses >
 PointConfiguration "*" -- ConfigurationManager: generates <
 Configuration -- "*" PointConfiguration: stores >
 
