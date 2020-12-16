@@ -8,6 +8,9 @@ namespace RealStereo.Config.Steps
 {
     public class ConfigurationStepCamera : ConfigurationStep
     {
+        private static readonly int MoveThreshold = 60;
+        private static readonly int StandStillTime = 3;
+
         private ConfigurationManager manager;
         private WorkerThread workerThread;
         private bool initialBalancingValue;
@@ -17,15 +20,16 @@ namespace RealStereo.Config.Steps
         private long lastMove = 0;
         private List<Point> coordinates = new List<Point>();
 
-        private static int MOVE_THRESHOLD = 60;
-        private static int STAND_STILL_TIME = 3;
-
         public ConfigurationStepCamera(ConfigurationManager manager, ref WorkerThread workerThread)
         {
             this.manager = manager;
             this.workerThread = workerThread;
         }
 
+        /// <summary>
+        /// Start the camera configuration step.
+        /// The person has to stand still for the defined amount of time until the coordinates are calculated.
+        /// </summary>
         public void Start()
         {
             if (initialized)
@@ -43,6 +47,7 @@ namespace RealStereo.Config.Steps
             lastMove = 0;
             lastCoordinates = null;
 
+            // give the person 5s time to go to the next position
             Task.Delay(5000).ContinueWith(_ =>
             {
                 System.Windows.Application.Current.Dispatcher.Invoke(() =>
@@ -64,6 +69,9 @@ namespace RealStereo.Config.Steps
             workerThread.SetBalancing(false);
         }
 
+        /// <summary>
+        /// Cancel the camera configuration step.
+        /// </summary>
         public void Cancel()
         {
             workerThread.SetCalibrating(false);
@@ -72,6 +80,11 @@ namespace RealStereo.Config.Steps
             isActiveStep = false;
         }
 
+        /// <summary>
+        /// Finishes the camera configuration step by returning the calculated coordiantes.
+        /// </summary>
+        /// <param name="currentConfiguration">Current configuration.</param>
+        /// <returns>Current configuration with coordinates set.</returns>
         public PointConfiguration Finish(PointConfiguration currentConfiguration)
         {
             int x = 0;
@@ -87,18 +100,27 @@ namespace RealStereo.Config.Steps
             return currentConfiguration;
         }
 
+        /// <summary>
+        /// Process the worker result by extracting the coordinates and checking if a person has moved.
+        /// </summary>
+        /// <param name="sender">Worker thread.</param>
+        /// <param name="e">Event arguments.</param>
         private void ResultReady(object sender, ResultReadyEventArgs e)
         {
             if (e.Result.GetCoordinates().HasValue)
             {
                 Point currentCoordinates = e.Result.GetCoordinates().Value;
+
+                // check if the person did move since the last result
                 if (DidMove(currentCoordinates))
                 {
+                    // reset the countdown if it already started
                     if (lastMove > 0)
                     {
                         lastMove = 0;
                         manager.SetInstructions("Go to the position and stand still");
 
+                        // if the configuration is currently in a different step, completely cancel the active step and start again
                         if (!isActiveStep)
                         {
                             manager.Cancel();
@@ -120,12 +142,14 @@ namespace RealStereo.Config.Steps
                 {
                     if (lastMove == 0)
                     {
+                        // if the person did not move and no countdown is set, start one
                         lastMove = DateTimeOffset.Now.ToUnixTimeMilliseconds();
                         manager.SetInstructions("Calculating coordinates");
                         coordinates.Clear();
                     }
-                    else if (isActiveStep && DateTimeOffset.Now.ToUnixTimeMilliseconds() - lastMove >= STAND_STILL_TIME * 1000)
+                    else if (isActiveStep && DateTimeOffset.Now.ToUnixTimeMilliseconds() - lastMove >= StandStillTime * 1000)
                     {
+                        // proceed to the next step if the person stood still long enough
                         manager.NextStep();
                         isActiveStep = false;
                     }
@@ -139,6 +163,11 @@ namespace RealStereo.Config.Steps
             }
         }
 
+        /// <summary>
+        /// Check if the person did move since the last result.
+        /// </summary>
+        /// <param name="coordinates">Current coordinates.</param>
+        /// <returns>Whether the person has moved or not.</returns>
         private bool DidMove(Point coordinates)
         {
             if (!lastCoordinates.HasValue)
@@ -146,12 +175,12 @@ namespace RealStereo.Config.Steps
                 return true;
             }
 
-            if (coordinates.X >= lastCoordinates.Value.X + MOVE_THRESHOLD || coordinates.X <= lastCoordinates.Value.X - MOVE_THRESHOLD)
+            if (coordinates.X >= lastCoordinates.Value.X + MoveThreshold || coordinates.X <= lastCoordinates.Value.X - MoveThreshold)
             {
                 return true;
             }
 
-            if (coordinates.Y >= lastCoordinates.Value.Y + MOVE_THRESHOLD || coordinates.Y <= lastCoordinates.Value.Y - MOVE_THRESHOLD)
+            if (coordinates.Y >= lastCoordinates.Value.Y + MoveThreshold || coordinates.Y <= lastCoordinates.Value.Y - MoveThreshold)
             {
                 return true;
             }

@@ -11,15 +11,20 @@ namespace RealStereo.Config
         public string SelectedRoom;
 
         [JsonIgnore]
-        private static Configuration Config = null;
+        private static Configuration config = null;
 
+        /// <summary>
+        /// Get the configuration instance.
+        /// </summary>
+        /// <returns>Configuration instance.</returns>
         public static Configuration GetInstance()
         {
-            if (Config != null)
+            if (config != null)
             {
-                return Config;
+                return config;
             }
 
+            // load the configuration from the appdata folder if it exists
             string basePath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
             string serialized;
 
@@ -32,11 +37,15 @@ namespace RealStereo.Config
                 serialized = "{}";
             }
 
-            Config = JsonConvert.DeserializeObject<Configuration>(serialized);
+            // deserialize the configuration into objects
+            config = JsonConvert.DeserializeObject<Configuration>(serialized);
 
-            return Config;
+            return config;
         }
 
+        /// <summary>
+        /// Save the current configuration.
+        /// </summary>
         public void Save()
         {
             string basePath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);

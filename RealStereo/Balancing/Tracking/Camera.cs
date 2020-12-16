@@ -20,10 +20,14 @@ namespace RealStereo.Balancing.Tracking
 
         public Camera(int cameraIndex, PeopleDetector peopleDetector)
         {
-            this.capture = new VideoCapture(cameraIndex, VideoCapture.API.Msmf);
+            capture = new VideoCapture(cameraIndex, VideoCapture.API.Msmf);
             this.peopleDetector = peopleDetector;
         }
 
+        /// <summary>
+        /// Processes the next frame from the camera and optionally detects people in it.
+        /// </summary>
+        /// <param name="detectPeople">If true, people will be detected in the frame.</param>
         public void Process(bool detectPeople)
         {
             Mat rawFrame = capture.QueryFrame();
@@ -52,6 +56,7 @@ namespace RealStereo.Balancing.Tracking
                 return;
             }
 
+            // normalize people by combining nearby regions and only use ones that were present in previous frames
             MCvObjectDetection[] updatedPeople = peopleDetector.Normalize(regions, people, history);
             peopleDetector.RotateHistory(regions, ref history);
 
@@ -65,6 +70,11 @@ namespace RealStereo.Balancing.Tracking
             DrawRegions(people, new Bgr(Color.LimeGreen), 2);
         }
 
+        /// <summary>
+        /// Get the current camera frame.
+        /// If people have been detected for that frame, their regions are drawn in the frame.
+        /// </summary>
+        /// <returns>Camera frame as a Bitmap Image.</returns>
         public BitmapImage GetFrame()
         {
             if (frame == null)
@@ -75,6 +85,13 @@ namespace RealStereo.Balancing.Tracking
             return ToBitmapImage(frame.ToBitmap());
         }
 
+        /// <summary>
+        /// Calculates the coordinates of the detected person in the current camera frame.
+        /// Based on the given orientation, either the X-coordinate (horizontal) or Y-coordinate (vertical) will be set.
+        /// If no person is detected, null will be returned.
+        /// </summary>
+        /// <param name="orientation"></param>
+        /// <returns></returns>
         public Point? GetCoordinates(Orientation orientation)
         {
             if (people == null || people.Length == 0)
@@ -96,6 +113,11 @@ namespace RealStereo.Balancing.Tracking
             return point;
         }
 
+        /// <summary>
+        /// Converts a Bitmap into a BitmapImage for easier use in WPF.
+        /// </summary>
+        /// <param name="bitmap">Bitmap source.</param>
+        /// <returns>Converted BitmapImage.</returns>
         private BitmapImage ToBitmapImage(Bitmap bitmap)
         {
             using (MemoryStream stream = new MemoryStream())
@@ -115,6 +137,12 @@ namespace RealStereo.Balancing.Tracking
             }
         }
 
+        /// <summary>
+        /// Draws the given region onto the current camera frame
+        /// </summary>
+        /// <param name="regions">Regions to draw.</param>
+        /// <param name="color">Color of the regions.</param>
+        /// <param name="thickness">Thickness in pixels of the regions.</param>
         private void DrawRegions(MCvObjectDetection[] regions, Bgr color, int thickness)
         {
             if (regions == null || regions.Length == 0)

@@ -9,25 +9,34 @@ namespace RealStereo.Balancing.Tracking
 {
     public class PeopleDetector
     {
-        private HOGDescriptor hogDescriptor;
-        private static int GROUP_THRESHOLD = 50;
-        private static int HISTORY_SIZE = 2;
-        private static double SCORE_THRESHOLD = 0.1;
+        private static readonly int GroupThreshold = 50;
+        private static readonly int HistorySize = 2;
+        private static readonly double ScoreThreshold = 0.1;
+
+        private HOGDescriptor descriptor;
 
         public PeopleDetector()
         {
-            hogDescriptor = new HOGDescriptor();
-            hogDescriptor.SetSVMDetector(HOGDescriptor.GetDefaultPeopleDetector());
+            descriptor = new HOGDescriptor();
+            descriptor.SetSVMDetector(HOGDescriptor.GetDefaultPeopleDetector());
         }
 
+        /// <summary>
+        /// Detect people in the given frame using the histogram of oriented gradients algorithm.
+        /// </summary>
+        /// <param name="frame">Input frame in which people should get detected.</param>
+        /// <returns>Regions of detected people.</returns>
         public MCvObjectDetection[] Detect(Image<Bgr, byte> frame)
         {
-            MCvObjectDetection[] regions = hogDescriptor.DetectMultiScale(frame, 0, new Size(2, 2), new Size(8, 8));
+            // detect people in the given frame using the HOG descriptor
+            MCvObjectDetection[] regions = descriptor.DetectMultiScale(frame, 0, new Size(2, 2), new Size(8, 8));
+
+            // filter the region based on the defined score
             List<MCvObjectDetection> filteredRegions = new List<MCvObjectDetection>();
 
             foreach (MCvObjectDetection region in regions)
             {
-                if (region.Score >= SCORE_THRESHOLD)
+                if (region.Score >= ScoreThreshold)
                 {
                     filteredRegions.Add(region);
                 }
@@ -36,6 +45,14 @@ namespace RealStereo.Balancing.Tracking
             return filteredRegions.ToArray();
         }
 
+        /// <summary>
+        /// Normalize detected regions by combining nearby ones and ensuring they were already present in previous frames.
+        /// This will reduce false-positives.
+        /// </summary>
+        /// <param name="regions">Newly detected regions.</param>
+        /// <param name="previousPeople">Previously confirmed people.</param>
+        /// <param name="history">History of detected regions of multiple previous frames.</param>
+        /// <returns></returns>
         public MCvObjectDetection[] Normalize(MCvObjectDetection[] regions, MCvObjectDetection[] previousPeople, List<MCvObjectDetection[]> history)
         {
             List<MCvObjectDetection> origin = new List<MCvObjectDetection>(regions);
@@ -85,18 +102,23 @@ namespace RealStereo.Balancing.Tracking
             return FilterNewPeople(results, previousPeople, history);
         }
 
+        /// <summary>
+        /// Add new confirmed people to the history and ensure it does not exceed the defined length.
+        /// </summary>
+        /// <param name="people">Newly confirmed people.</param>
+        /// <param name="history">Previous history.</param>
         public void RotateHistory(MCvObjectDetection[] people, ref List<MCvObjectDetection[]> history)
         {
             // initialize empty history if unset
             if (history.Count == 0)
             {
-                for (int i = 0; i < HISTORY_SIZE; i++)
+                for (int i = 0; i < HistorySize; i++)
                 {
                     history.Add(new MCvObjectDetection[] { });
                 }
             }
 
-            for (int i = HISTORY_SIZE - 1; i > 0; i--)
+            for (int i = HistorySize - 1; i > 0; i--)
             {
                 if (history.Count > i - 1)
                 {
@@ -107,11 +129,23 @@ namespace RealStereo.Balancing.Tracking
             history[0] = people;
         }
 
+        /// <summary>
+        /// Will enlarge the given rectangle by the defined grouping threshold.
+        /// </summary>
+        /// <param name="rect">Input rectangle.</param>
+        /// <returns>Enlarged rectangle.</returns>
         private Rectangle EnlargeRectangle(Rectangle rect)
         {
-            return new Rectangle(rect.X - GROUP_THRESHOLD, rect.Y - GROUP_THRESHOLD, rect.Width + GROUP_THRESHOLD * 2, rect.Height + GROUP_THRESHOLD * 2);
+            return new Rectangle(rect.X - GroupThreshold, rect.Y - GroupThreshold, rect.Width + GroupThreshold * 2, rect.Height + GroupThreshold * 2);
         }
 
+        /// <summary>
+        /// Filters the given regions and removes them if they are not previously confirmed people or in the same place over multiple frames.
+        /// </summary>
+        /// <param name="regions">Newly detected regions.</param>
+        /// <param name="previousPeople">Previously confirmed people.</param>
+        /// <param name="history">Current history.</param>
+        /// <returns></returns>
         private MCvObjectDetection[] FilterNewPeople(List<MCvObjectDetection> regions, MCvObjectDetection[] previousPeople, List<MCvObjectDetection[]> history)
         {
             for (int i = regions.Count - 1; i >= 0; i--)
@@ -132,10 +166,10 @@ namespace RealStereo.Balancing.Tracking
                 // if it is not overlapping with a previously recognized person, check if it was in the history the whole time and mark it as a recognized person if so
                 if (isNew)
                 {
-                    for (int j = 0; j < history.Count; j++)
+                    for (int historyIndex = 0; historyIndex < history.Count; historyIndex++)
                     {
                         bool intersects = false;
-                        foreach (MCvObjectDetection historyEntry in history[j])
+                        foreach (MCvObjectDetection historyEntry in history[historyIndex])
                         {
                             if (historyEntry.Rect.IntersectsWith(enlargedResult))
                             {
@@ -149,7 +183,7 @@ namespace RealStereo.Balancing.Tracking
                             break;
                         }
 
-                        if (j == history.Count - 1)
+                        if (historyIndex == history.Count - 1)
                         {
                             isNew = false;
                         }

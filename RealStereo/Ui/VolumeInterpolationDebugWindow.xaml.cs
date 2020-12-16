@@ -8,9 +8,6 @@ using System.Windows.Shapes;
 
 namespace RealStereo.Ui
 {
-    /// <summary>
-    /// Interaction logic for VolumeInterpolationDebugWindow.xaml
-    /// </summary>
     public partial class VolumeInterpolationDebugWindow : Window
     {
         private WorkerThread workerThread;
@@ -22,22 +19,34 @@ namespace RealStereo.Ui
             InitializeComponent();
         }
 
+        /// <summary>
+        /// Set the current worker thread.
+        /// </summary>
+        /// <param name="workerThread">Worker thread.</param>
         public void SetWorkerThread(WorkerThread workerThread)
         {
             this.workerThread = workerThread;
         }
 
+        /// <summary>
+        /// Set the currently selected speaker.
+        /// </summary>
+        /// <param name="speakerIndex">Speaker index.</param>
         public void SetSpeakerIndex(int speakerIndex)
         {
             this.speakerIndex = speakerIndex;
         }
 
+        /// <summary>
+        /// Draw the interpolation results.
+        /// </summary>
         public void Draw()
         {
             VolumeInterpolation volumeInterpolation = workerThread.GetVolumeInterpolation();
             int scale = volumeInterpolation.GetScale();
             double[] minMax = GetMinMax();
 
+            // draw result for all coordinates
             for (int x = 0; x < volumeInterpolation.Values.GetLength(0); x++)
             {
                 for (int y = 0; y < volumeInterpolation.Values.GetLength(1); y++)
@@ -54,6 +63,7 @@ namespace RealStereo.Ui
                 }
             }
 
+            // add the current position
             currentPosition = new Rectangle();
             currentPosition.Width = scale;
             currentPosition.Height = scale;
@@ -65,6 +75,10 @@ namespace RealStereo.Ui
             workerThread.ResultReady += ResultReady;
         }
 
+        /// <summary>
+        /// Gets the global minimum and maximum of the interpolation.
+        /// </summary>
+        /// <returns>Array where minimum is stored at index 0 and maximum at index 1.</returns>
         private double[] GetMinMax()
         {
             VolumeInterpolation volumeInterpolation = workerThread.GetVolumeInterpolation();
@@ -91,6 +105,11 @@ namespace RealStereo.Ui
             return minMax;
         }
 
+        /// <summary>
+        /// Update the current position when it changes.
+        /// </summary>
+        /// <param name="sender">Worker thread.</param>
+        /// <param name="e">Event arguments.</param>
         private void ResultReady(object sender, ResultReadyEventArgs e)
         {
             if (e.Result.GetCoordinates().HasValue)
@@ -102,6 +121,11 @@ namespace RealStereo.Ui
             }
         }
 
+        /// <summary>
+        /// Stop listening on position updates when the window closes.
+        /// </summary>
+        /// <param name="sender">Window.</param>
+        /// <param name="e">Event arguments.</param>
         private void OnClosing(object sender, CancelEventArgs e)
         {
             workerThread.ResultReady -= ResultReady;

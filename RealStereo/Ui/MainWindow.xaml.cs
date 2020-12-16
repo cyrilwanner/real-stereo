@@ -14,9 +14,6 @@ using Image = System.Windows.Controls.Image;
 
 namespace RealStereo.Ui
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
     public partial class MainWindow : Window
     {
         private Dictionary<Image, Camera> cameras = new Dictionary<Image, Camera>();
@@ -32,12 +29,22 @@ namespace RealStereo.Ui
             Loaded += new RoutedEventHandler(InitializeSelectedConfiguration);
         }
 
+        /// <summary>
+        /// Starts the worker thread once the window is loaded.
+        /// </summary>
+        /// <param name="sender">Window.</param>
+        /// <param name="e">Event arguments.</param>
         private void StartWorkerThread(object sender, RoutedEventArgs e)
         {
             workerThread = new WorkerThread(ref cameras);
             workerThread.ResultReady += ResultReady;
         }
 
+        /// <summary>
+        /// Initializes the selected configuration once the window is loaded.
+        /// </summary>
+        /// <param name="sender">Window.</param>
+        /// <param name="e">Event arguments.</param>
         private void InitializeSelectedConfiguration(object sender, RoutedEventArgs e)
         {
             string selectedRoom = Configuration.GetInstance().SelectedRoom;
@@ -51,13 +58,20 @@ namespace RealStereo.Ui
             }
         }
 
+        /// <summary>
+        /// Update the main window when the next result of the worker thread is ready.
+        /// </summary>
+        /// <param name="sender">Worker thread.</param>
+        /// <param name="e">Event arguments.</param>
         private void ResultReady(object sender, ResultReadyEventArgs e)
         {
+            // update coordinates text
             if (e.Result.GetCoordinates().HasValue)
             {
                 coordinatesTextBlock.Text = "Point(" + e.Result.GetCoordinates().Value.X + ", " + e.Result.GetCoordinates().Value.Y + ")";
             }
 
+            // update the two camera frames
             if (e.Result.GetFrames() != null)
             {
                 for (int i = 0; i < e.Result.GetFrames().Length; i++)
@@ -67,6 +81,11 @@ namespace RealStereo.Ui
             }
         }
 
+        /// <summary>
+        /// Toggles the current balancing state of the worker thread.
+        /// </summary>
+        /// <param name="sender">Button.</param>
+        /// <param name="e">Event arguments.</param>
         private void ToggleBalancing(object sender, RoutedEventArgs e)
         {
             isBalancing = !isBalancing;
@@ -75,6 +94,9 @@ namespace RealStereo.Ui
             startBalancingButton.Content = (isBalancing ? "Stop" : "Start") + " Balancing";
         }
 
+        /// <summary>
+        /// Updates the list with all channels of the audio output device and their volumes.
+        /// </summary>
         private void UpdateChannelLevelList()
         {
             if (channelLevelsPanel == null)
@@ -90,6 +112,7 @@ namespace RealStereo.Ui
 
                 for (int channelIndex = 0; channelIndex < audioOut.AudioEndpointVolume.Channels.Count; channelIndex++)
                 {
+                    // create the channel label
                     Label label = new Label();
                     if (AudioChannelMap.Map.ContainsKey(channelIndex))
                     {
@@ -102,6 +125,7 @@ namespace RealStereo.Ui
                     label.MouseDoubleClick += OpenVolumeInterpolationDebugWindow;
                     channelLevelsPanel.Children.Add(label);
 
+                    // create the channel volume indicator with a progress bar
                     ProgressBar progressBar = new ProgressBar();
                     progressBar.Value = audioOut.AudioEndpointVolume.Channels[channelIndex].VolumeLevelScalar * 100;
                     channelLevelsPanel.Children.Add(progressBar);
@@ -111,6 +135,9 @@ namespace RealStereo.Ui
             UpdateChannelLevels();
         }
 
+        /// <summary>
+        /// Updates the actual channel volume indicators.
+        /// </summary>
         public void UpdateChannelLevels()
         {
             if (audioOutputComboBox.SelectedItem is MMDevice)
@@ -139,6 +166,11 @@ namespace RealStereo.Ui
             }
         }
 
+        /// <summary>
+        /// Populate the camera dropdown with all available cameras once it is opened.
+        /// </summary>
+        /// <param name="sender">Camera combo box.</param>
+        /// <param name="e">Event arguments.</param>
         private void cameraComboBox_DropDownOpened(object sender, EventArgs e)
         {
             ComboBox comboBox = sender as ComboBox;
@@ -148,9 +180,12 @@ namespace RealStereo.Ui
             comboBox.Items.Clear();
             comboBox.Items.Add("None");
 
+            // create device enumerable
             IMFActivate[] devices;
             HResult hr = MF.EnumVideoDeviceSources(out devices);
             hr.ThrowExceptionOnError();
+
+            // loop through all devices and add them as a combo box item
             for (int i = 0; i < devices.Length; i++)
             {
                 string friendlyName;
@@ -171,12 +206,18 @@ namespace RealStereo.Ui
                     comboBox.SelectedItem = friendlyName;
                 }
             }
+
             if (comboBox.SelectedItem == null)
             {
                 comboBox.SelectedIndex = 0;
             }
         }
 
+        /// <summary>
+        /// Update the camera in the worker thread when the selection in the dropdown is changed.
+        /// </summary>
+        /// <param name="sender">Camera combo box.</param>
+        /// <param name="e">Event arguments.</param>
         private void cameraComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             ComboBox comboBox = sender as ComboBox;
@@ -184,6 +225,7 @@ namespace RealStereo.Ui
             {
                 return;
             }
+
             ComboBox otherComboBox = comboBox == camera1ComboBox ? camera2ComboBox : camera1ComboBox;
             Image camera = comboBox == camera1ComboBox ? camera1 : camera2;
             Image otherCamera = comboBox == camera1ComboBox ? camera2 : camera1;
@@ -198,13 +240,19 @@ namespace RealStereo.Ui
                 }
 
                 cameras[camera] = new Camera(videoDeviceNameIndexDictionary[comboBox.SelectedItem as string], new PeopleDetector());
-            } else
+            }
+            else
             {
                 cameras.Remove(camera);
                 camera.Source = null;
             }
         }
 
+        /// <summary>
+        /// Populate the audio device dropdown when it is opened.
+        /// </summary>
+        /// <param name="sender">Audio device combo box.</param>
+        /// <param name="e">Event arguments.</param>
         private void audioDeviceComboBox_DropDownOpened(object sender, EventArgs e)
         {
             ComboBox comboBox = (ComboBox)sender;
@@ -214,7 +262,8 @@ namespace RealStereo.Ui
             if (comboBox == audioOutputComboBox)
             {
                 audioDeviceCollection = audioDeviceEnumerator.EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active);
-            } else
+            }
+            else
             {
                 audioDeviceCollection = audioDeviceEnumerator.EnumerateAudioEndPoints(DataFlow.Capture, DeviceState.Active);
             }
@@ -230,12 +279,18 @@ namespace RealStereo.Ui
                     comboBox.SelectedItem = audioDevice;
                 }
             }
+
             if (comboBox.SelectedItem == null)
             {
                 comboBox.SelectedIndex = 0;
             }
         }
 
+        /// <summary>
+        /// Update the audio device on the worker thread when the selection of the dropdown has changed.
+        /// </summary>
+        /// <param name="sender">Audio device combo box.</param>
+        /// <param name="e">Event arguments.</param>
         private void audioDeviceComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             ComboBox comboBox = (ComboBox)sender;
@@ -243,6 +298,7 @@ namespace RealStereo.Ui
             {
                 return;
             }
+
             MMDevice audioDevice = comboBox.SelectedItem is MMDevice ? (MMDevice)comboBox.SelectedItem : null;
             if (audioDevice == null)
             {
@@ -260,6 +316,11 @@ namespace RealStereo.Ui
             }
         }
 
+        /// <summary>
+        /// Populates the room combo box when it is opened.
+        /// </summary>
+        /// <param name="sender">Room combo box.</param>
+        /// <param name="e">Event arguments.</param>
         private void roomComboBox_DropDownOpened(object sender, EventArgs e)
         {
             ComboBox comboBox = sender as ComboBox;
@@ -285,6 +346,11 @@ namespace RealStereo.Ui
             }
         }
 
+        /// <summary>
+        /// Changes the selected room and it's interpolation when the selection of the dropdown has changed.
+        /// </summary>
+        /// <param name="sender">Room combo box.</param>
+        /// <param name="e">Event arguments.</param>
         private void roomComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (startBalancingButton == null)
@@ -309,6 +375,11 @@ namespace RealStereo.Ui
             }
         }
 
+        /// <summary>
+        /// Start a new configuration.
+        /// </summary>
+        /// <param name="sender">Button.</param>
+        /// <param name="e">Event arguments.</param>
         private void EditConfiguration(object sender, RoutedEventArgs e)
         {
             ConfigurationWindow window = new ConfigurationWindow();
@@ -320,6 +391,11 @@ namespace RealStereo.Ui
             window.ShowDialog();
         }
 
+        /// <summary>
+        /// Opens the volume interpolation debug window.
+        /// </summary>
+        /// <param name="sender">Channel label.</param>
+        /// <param name="e">Event arguments.</param>
         private void OpenVolumeInterpolationDebugWindow(object sender, RoutedEventArgs e)
         {
             if (Configuration.GetInstance().SelectedRoom == null)
@@ -337,6 +413,11 @@ namespace RealStereo.Ui
             window.ShowDialog();
         }
 
+        /// <summary>
+        /// Stop the worker thread when the window closes.
+        /// </summary>
+        /// <param name="sender">Window.</param>
+        /// <param name="e">Event arguments.</param>
         private void OnClosed(object sender, EventArgs e)
         {
             workerThread.Stop();
