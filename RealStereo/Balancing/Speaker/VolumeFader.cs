@@ -14,6 +14,11 @@ namespace RealStereo.Balancing.Speaker
             this.workerThread = workerThread;
         }
 
+        /// <summary>
+        /// Set the target volume for all channels.
+        /// The volume will then fade to the new target.
+        /// </summary>
+        /// <param name="channels">Target volume for all channels.</param>
         public void Set(float[] channels)
         {
             targetVolumes = channels;
@@ -25,6 +30,9 @@ namespace RealStereo.Balancing.Speaker
             }
         }
 
+        /// <summary>
+        /// Stops the thread and so the volume fading.
+        /// </summary>
         public void Cancel()
         {
             if (thread != null && thread.IsAlive)
@@ -33,6 +41,9 @@ namespace RealStereo.Balancing.Speaker
             }
         }
 
+        /// <summary>
+        /// Main thread function. Fades the volume for all channels to the target volume.
+        /// </summary>
         private void Run()
         {
             try

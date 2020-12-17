@@ -15,6 +15,8 @@ namespace RealStereo.Balancing
 {
     public class WorkerThread
     {
+        private static readonly int Fps = 10;
+
         private Thread thread;
         private Dictionary<Image, Camera> cameras;
         private bool isBalancing = false;
@@ -23,8 +25,6 @@ namespace RealStereo.Balancing
         private MMDevice inputAudioDevice;
         private VolumeInterpolation volumeInterpolation;
         private VolumeFader volumeFader;
-
-        private static int FPS = 10;
 
         public WorkerThread(ref Dictionary<Image, Camera> cameras)
         {
@@ -38,66 +38,119 @@ namespace RealStereo.Balancing
 
         public event EventHandler<ResultReadyEventArgs> ResultReady;
 
+        /// <summary>
+        /// Set whether the worker thread should balance the speakers.
+        /// This will enable people detection and speaker balancing.
+        /// </summary>
+        /// <param name="isBalancing"></param>
         public void SetBalancing(bool isBalancing)
         {
             this.isBalancing = isBalancing;
         }
 
+        /// <summary>
+        /// Set whether the worker thread should calibrate the equipment.
+        /// This will enable people detection but not speaker balancing.
+        /// </summary>
+        /// <param name="isCalibrating"></param>
         public void SetCalibrating(bool isCalibrating)
         {
             this.isCalibrating = isCalibrating;
         }
 
+        /// <summary>
+        /// Sets the audio device used for balancing.
+        /// </summary>
+        /// <param name="outputAudioDevice">Output audio device.</param>
         public void SetOutputAudioDevice(MMDevice outputAudioDevice)
         {
             this.outputAudioDevice = outputAudioDevice;
         }
 
+        /// <summary>
+        /// Gets the audio deviced used for balancing.
+        /// </summary>
+        /// <returns>Output audio device.</returns>
         public MMDevice GetOutputAudioDevice()
         {
             return outputAudioDevice;
         }
 
+        /// <summary>
+        /// Sets the audio device used for recording during configuration.
+        /// </summary>
+        /// <param name="inputAudioDevice">Input audio device</param>
         public void SetInputAudioDevice(MMDevice inputAudioDevice)
         {
             this.inputAudioDevice = inputAudioDevice;
         }
 
+        /// <summary>
+        /// Gets the audio device used for recording.
+        /// </summary>
+        /// <returns>Input audio device.</returns>
         public MMDevice GetInputAudioDevice()
         {
             return inputAudioDevice;
         }
 
+        /// <summary>
+        /// Returns whether the worker thread is currently balancing.
+        /// </summary>
+        /// <returns></returns>
         public bool IsBalancing()
         {
             return isBalancing;
         }
 
+        /// <summary>
+        /// Returns whether the worker thread is currently calibrating.
+        /// </summary>
+        /// <returns></returns>
         public bool IsCalibrating()
         {
             return isCalibrating;
         }
 
+        /// <summary>
+        /// Get the selected cameras.
+        /// </summary>
+        /// <returns></returns>
         public ref Dictionary<Image, Camera> GetCameras()
         {
             return ref cameras;
         }
 
+        /// <summary>
+        /// Set the volume interpolation instance.
+        /// </summary>
+        /// <param name="volumeInterpolation"></param>
         public void SetVolumeInterpolation(VolumeInterpolation volumeInterpolation)
         {
             this.volumeInterpolation = volumeInterpolation;
         }
 
+        /// <summary>
+        /// Get the volume interpolation instance.
+        /// </summary>
+        /// <returns></returns>
         public VolumeInterpolation GetVolumeInterpolation()
         {
             return volumeInterpolation;
         }
 
+        /// <summary>
+        /// Stop the whole worker thread. This will abort all pending work.
+        /// </summary>
         public void Stop()
         {
             thread.Interrupt();
         }
 
+        /// <summary>
+        /// Calls the event listeners when a new result is ready.
+        /// </summary>
+        /// <param name="result">New result.</param>
         protected virtual void OnResultReady(WorkerResult result)
         {
             if (ResultReady != null)
@@ -109,6 +162,9 @@ namespace RealStereo.Balancing
             }
         }
 
+        /// <summary>
+        /// Main thread method.
+        /// </summary>
         private void Run()
         {
             try
@@ -117,7 +173,7 @@ namespace RealStereo.Balancing
                 {
                     DoWork();
 
-                    Thread.Sleep(1000 / FPS);
+                    Thread.Sleep(1000 / Fps);
                 }
             }
             catch (ThreadInterruptedException)
@@ -126,17 +182,25 @@ namespace RealStereo.Balancing
             }
         }
 
+        /// <summary>
+        /// Combines the people tracking and speaker balancing.
+        /// It first processes the next camera frames and receives the coordinates of the detected people.
+        /// Afterwards, the speaker will be balanced.
+        /// It also updates the UI Windows and triggers new result events.
+        /// </summary>
         private void DoWork()
         {
             WorkerResult result = new WorkerResult(cameras.Keys.Count);
             Point coordinates = new Point(0, 0);
             bool applyCoordinates = true;
 
+            // process all cameras
             for (int i = 0; i < cameras.Keys.Count; i++)
             {
                 Image image = cameras.Keys.ElementAt(i);
                 Camera camera = cameras[image];
 
+                // process next frame and detect people/coordinates if needed
                 camera.Process(isBalancing || isCalibrating);
                 result.SetFrame(i, camera.GetFrame());
                 Point? cameraCoordinates = camera.GetCoordinates(i % 2 == 0 ? Orientation.Horizontal : Orientation.Vertical);
@@ -168,6 +232,7 @@ namespace RealStereo.Balancing
                 }
             }
 
+            // dispatch the result ready event and update the main window
             if (Application.Current != null)
             {
                 Application.Current.Dispatcher.Invoke(() => {

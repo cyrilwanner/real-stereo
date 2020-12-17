@@ -1,6 +1,8 @@
 ﻿using RealStereo.Balancing;
 using RealStereo.Config;
+using System.ComponentModel;
 using System.Windows;
+using System.Windows.Controls;
 
 namespace RealStereo.Ui
 {
@@ -17,6 +19,10 @@ namespace RealStereo.Ui
             InitializeComponent();
         }
 
+        /// <summary>
+        /// Initializes the configuration window.
+        /// </summary>
+        /// <param name="workerThread">Used worker thread.</param>
         public void InitConfiguration(ref WorkerThread workerThread)
         {
             manager = new ConfigurationManager(ref workerThread, instructionsText, instructionsBox, audioInputDeviceVolume, positions, saveButton);
@@ -24,6 +30,10 @@ namespace RealStereo.Ui
             UpdateStartButton();
         }
 
+        /// <summary>
+        /// Updates the enabled state of the start button.
+        /// Requires all devices to be selected and a unique name for an enabled button.
+        /// </summary>
         private void UpdateStartButton()
         {
             if (workerThread.GetCameras().Keys.Count >= 2 && workerThread.GetOutputAudioDevice() != null && workerThread.GetInputAudioDevice() != null && roomNameTextBox.Text.Trim().Length > 0 && !Configuration.GetInstance().Rooms.ContainsKey(roomNameTextBox.Text))
@@ -36,6 +46,12 @@ namespace RealStereo.Ui
             }
         }
 
+        /// <summary>
+        /// Handles a click on the cancel button.
+        /// Will cancel the whole configuration.
+        /// </summary>
+        /// <param name="sender">Button.</param>
+        /// <param name="e">Event arguments.</param>
         private void CancelConfiguration(object sender, object e)
         {
             manager.Cancel();
@@ -43,6 +59,12 @@ namespace RealStereo.Ui
             Close();
         }
 
+        /// <summary>
+        /// Handles a click on the start button.
+        /// Will start the configuration.
+        /// </summary>
+        /// <param name="sender">Button.</param>
+        /// <param name="e">Event arguments.</param>
         private void StartConfiguration(object sender, RoutedEventArgs e)
         {
             startCalibrationButton.IsEnabled = false;
@@ -52,7 +74,13 @@ namespace RealStereo.Ui
             manager.Start();
         }
 
-        private void OnClosing(object sender, System.ComponentModel.CancelEventArgs e)
+        /// <summary>
+        /// Handles the window closing event.
+        /// Will stop the configuration.
+        /// </summary>
+        /// <param name="sender">Window</param>
+        /// <param name="e">Event arguments</param>
+        private void OnClosing(object sender, CancelEventArgs e)
         {
             if (manager != null)
             {
@@ -61,6 +89,12 @@ namespace RealStereo.Ui
             }
         }
 
+        /// <summary>
+        /// Handles a click on the save button.
+        /// Will save the configuration to the file.
+        /// </summary>
+        /// <param name="sender">Button.</param>
+        /// <param name="e">Event arguments.</param>
         private void SaveConfiguration(object sender, RoutedEventArgs e)
         {
             manager.Cancel();
@@ -70,7 +104,13 @@ namespace RealStereo.Ui
             Close();
         }
 
-        private void RoomNameChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+        /// <summary>
+        /// Handles a change in the room name textbox.
+        /// Will update the enabled state of the start button based on the uniqueness of the name.
+        /// </summary>
+        /// <param name="sender">Text box</param>
+        /// <param name="e">Event arguments.</param>
+        private void RoomNameChanged(object sender, TextChangedEventArgs e)
         {
             UpdateStartButton();
         }

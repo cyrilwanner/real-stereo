@@ -10,9 +10,10 @@ namespace RealStereo.Config
     class TestTone
     {
         private SignalGenerator sineSignalGenerator;
-        private MMDevice outputAudioDevice, inputAudioDevice;
+        private MMDevice outputAudioDevice;
+        private MMDevice inputAudioDevice;
         private IWavePlayer outWavePlayer;
-        private WasapiCapture wasapiCapture;
+        private WasapiCapture capture;
         private readonly List<float> captureSamples = new List<float>();
 
         public TestTone(MMDevice outputAudioDevice, MMDevice inputAudioDevice)
@@ -27,13 +28,22 @@ namespace RealStereo.Config
             this.inputAudioDevice = inputAudioDevice;
         }
 
+        /// <summary>
+        /// Play a test tone for the given amount of time on the selected audio output devie.
+        /// </summary>
+        /// <param name="seconds">Test tone length in seconds.</param>
+        /// <param name="PlaybackStopped">Event handler that will be called once the tone has stopped.</param>
         public void Play(int seconds, EventHandler<StoppedEventArgs> PlaybackStopped = null)
         {
             captureSamples.Clear();
-            wasapiCapture = new WasapiCapture(inputAudioDevice);
-            BiQuadFilter lowPassFilter = BiQuadFilter.LowPassFilter(wasapiCapture.WaveFormat.SampleRate, 1900, 1);
-            BiQuadFilter highPassFilter = BiQuadFilter.HighPassFilter(wasapiCapture.WaveFormat.SampleRate, 2100, 1);
-            wasapiCapture.DataAvailable += new EventHandler<WaveInEventArgs>(delegate (object o, WaveInEventArgs e)
+            capture = new WasapiCapture(inputAudioDevice);
+
+            // define a low- & high pass filter to reduce background noise
+            BiQuadFilter lowPassFilter = BiQuadFilter.LowPassFilter(capture.WaveFormat.SampleRate, 1900, 1);
+            BiQuadFilter highPassFilter = BiQuadFilter.HighPassFilter(capture.WaveFormat.SampleRate, 2100, 1);
+
+            // when data is recorded, apply the filters and store the sample
+            capture.DataAvailable += new EventHandler<WaveInEventArgs>(delegate (object o, WaveInEventArgs e)
             {
                 for (int i = 0; i < e.BytesRecorded; i += 4)
                 {
@@ -44,44 +54,58 @@ namespace RealStereo.Config
                 }
             });
 
-            outWavePlayer = new WasapiOut(outputAudioDevice, AudioClientShareMode.Shared, false, 250); // High latency (big buffer) of 250, since our camera detection uses so much CPU
+            // define output with a high latency (big buffer) of 250, since our camera detection uses so much CPU
+            outWavePlayer = new WasapiOut(outputAudioDevice, AudioClientShareMode.Shared, false, 250);
             outWavePlayer.PlaybackStopped += new EventHandler<StoppedEventArgs>(delegate (object o, StoppedEventArgs e)
             {
-                wasapiCapture.Dispose();
+                capture.Dispose();
                 outWavePlayer.Dispose();
             });
+
             if (PlaybackStopped != null)
             {
                 outWavePlayer.PlaybackStopped += PlaybackStopped;
             }
+
             outWavePlayer.Init(sineSignalGenerator.Take(TimeSpan.FromSeconds(seconds)));
             outWavePlayer.Play();
-            wasapiCapture.StartRecording();
+            capture.StartRecording();
         }
 
+        /// <summary>
+        /// Stop the test tone before before it is played for the specified amount of time.
+        /// </summary>
         public void Stop()
         {
             if (outWavePlayer == null)
             {
                 return;
             }
+
             outWavePlayer.Stop();
         }
 
+        /// <summary>
+        /// Calculates the average recorded volume.
+        /// </summary>
+        /// <returns>Average recorded volume.</returns>
         public float GetAverageCaptureVolume()
         {
             int count = captureSamples.Count;
             float sum = 0;
+
             for (int i = 0; i < count; i++)
             {
                 if (captureSamples[i] < 0)
                 {
                     sum -= captureSamples[i];
-                } else
+                }
+                else
                 {
                     sum += captureSamples[i];
                 }
             }
+
             return sum / count;
         }
     }

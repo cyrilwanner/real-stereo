@@ -34,11 +34,18 @@ namespace RealStereo.Config
             this.saveButton = saveButton;
         }
 
+        /// <summary>
+        /// Start a new configuration.
+        /// </summary>
         public void Start()
         {
             steps[currentStep].Start();
         }
 
+        /// <summary>
+        /// Proceed to the next configuration step.
+        /// If it is already the last step, configuration will start over at a new position.
+        /// </summary>
         public void NextStep()
         {
             currentConfiguration = steps[currentStep].Finish(currentConfiguration);
@@ -54,6 +61,9 @@ namespace RealStereo.Config
             }
         }
 
+        /// <summary>
+        /// Proceed to the next position.
+        /// </summary>
         private void NextPosition()
         {
             // update UI
@@ -79,6 +89,9 @@ namespace RealStereo.Config
             }
         }
 
+        /// <summary>
+        /// Cancel the current configuration and all steps.
+        /// </summary>
         public void Cancel()
         {
             foreach (ConfigurationStep step in steps)
@@ -89,33 +102,56 @@ namespace RealStereo.Config
             currentStep = 0;
         }
 
+        /// <summary>
+        /// Sets the instruction text.
+        /// </summary>
+        /// <param name="text">Instructions.</param>
         public void SetInstructions(string text)
         {
             instructionsBox.BorderBrush = Brushes.Green;
             instructionsText.Text = text;
         }
 
+        /// <summary>
+        /// Sets the error text.
+        /// </summary>
+        /// <param name="text">Error.</param>
         public void SetError(string text)
         {
             instructionsBox.BorderBrush = Brushes.Red;
             instructionsText.Text = text;
         }
 
+        /// <summary>
+        /// Sets the input audio device volume.
+        /// </summary>
+        /// <param name="value">Volume.</param>
         public void SetAudioInputDeviceVolume(float value)
         {
             audioInputDeviceVolume.Value = value;
         }
 
+        /// <summary>
+        /// Get all configured positions.
+        /// </summary>
+        /// <returns>Configured positions.</returns>
         public List<PointConfiguration> GetConfigurations()
         {
             return configurations;
         }
 
+        /// <summary>
+        /// Terminates the configuration.
+        /// </summary>
         public void Terminate()
         {
             terminated = true;
         }
 
+        /// <summary>
+        /// Whether the configuration is terminated or not.
+        /// </summary>
+        /// <returns></returns>
         public bool IsTerminated()
         {
             return terminated;
