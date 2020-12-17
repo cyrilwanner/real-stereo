@@ -13,12 +13,12 @@ package "RealStereo.Balancing" as Balancing {
   }
 
   class WorkerThread {
-    - bool IsBalancing
-    - bool IsCalibrating
-    - MMDevice OutputAudioDevice
-    - MMDevice InputAudioDevice
-    - VolumeInterpolation VolumeInterpolation
-    - VolumeFader VolumeFader
+    - bool isBalancing
+    - bool isCalibrating
+    - MMDevice outputAudioDevice
+    - MMDevice inputAudioDevice
+    - VolumeInterpolation volumeInterpolation
+    - VolumeFader volumeFader
     + event EventHandler<ResultReadyEventArgs> ResultReady;
     + void Stop()
     # void OnResultReady(WorkerResult result)
@@ -39,9 +39,9 @@ package "RealStereo.Balancing.Speaker" as Speaker {
   }
 
   class VolumeInterpolation {
-    - {static} int ORIGIN_SIZE = 500
-    - {static} int TARGET_SIZE = 100
-    - {static} double POWER = 1.5
+    - {static} int OriginSize = 500
+    - {static} int TargetSize = 100
+    - {static} double Power = 1.5
     + double[,,,] Values
     + int GetScale()
     + int MapCoordinate(int x)
@@ -61,9 +61,9 @@ package "RealStereo.Balancing.Tracking" as Tracking {
   }
 
   class PeopleDetector {
-    - {static} int GROUP_THRESHOLD = 50
-    - {static} int HISTORY_SIZE = 2
-    - {static} int SCORE_THRESHOLD = 0.1
+    - {static} int GroupThreshold = 50
+    - {static} int HistorySize = 2
+    - {static} int ScoreThreshold = 0.1
     + MCvObjectDetection[] Detect(Image<Bgr, byte> frame)
     + MCvObjectDetection[] Normalize(MCvObjectDetection[] regions,\n MCvObjectDetection[] previousPeople, List<MCvObjectDetection[]> history)
     + void RotateHistory(MCvObjectDetection[] people, ref List<MCvObjectDetection[]> history)

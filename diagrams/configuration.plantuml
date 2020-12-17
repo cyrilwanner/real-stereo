@@ -12,7 +12,7 @@ package "RealStereo.Config" as Config {
   }
 
   class ConfigurationManager {
-    - ConfigurationStep[] Steps
+    - ConfigurationStep[] steps
     + void Start()
     + void NextStep()
     + void NextPosition()
@@ -39,15 +39,15 @@ package "RealStereo.Config.Steps" as Steps {
   }
 
   class ConfigurationStepCamera implements ConfigurationStep {
-    - {static} int MOVE_THRESHOLD = 60
-    - {static} int STAND_STILL_TIME = 3
+    - {static} int MoveThreshold = 60
+    - {static} int StandStillTime = 3
     - void ResultReady(object sender, ResultReadyEventArgs e)
     - bool DidMove(Point coordinates)
   }
 
   class ConfigurationStepSpeaker implements ConfigurationStep {
-    - {static} int TEST_TONE_LENGTH = 2
-    - {static} int TEST_TONE_SCALING_TARGET = 0.5f
+    - {static} int TestToneLength = 2
+    - {static} int TestToneScalingTarget = 0.5f
     - void TestToneStopped(object sender, StoppedEventArgs e)
     - void MuteAllChannels()
   }
