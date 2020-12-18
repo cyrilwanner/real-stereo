@@ -39,8 +39,8 @@ namespace RealStereo.Config
             capture = new WasapiCapture(inputAudioDevice);
 
             // define a low- & high pass filter to reduce background noise
-            BiQuadFilter lowPassFilter = BiQuadFilter.LowPassFilter(capture.WaveFormat.SampleRate, 1900, 1);
-            BiQuadFilter highPassFilter = BiQuadFilter.HighPassFilter(capture.WaveFormat.SampleRate, 2100, 1);
+            BiQuadFilter lowPassFilter = BiQuadFilter.LowPassFilter(capture.WaveFormat.SampleRate, 2100, 1);
+            BiQuadFilter highPassFilter = BiQuadFilter.HighPassFilter(capture.WaveFormat.SampleRate, 1900, 1);
 
             // when data is recorded, apply the filters and store the sample
             capture.DataAvailable += new EventHandler<WaveInEventArgs>(delegate (object o, WaveInEventArgs e)
